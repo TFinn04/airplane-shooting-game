@@ -106,6 +106,9 @@ class Game:
             for enemy in enemies:
                 enemy.move()
                 enemy.draw(screen)
+                if (random.randint(0,150)==0):
+                    enemy.shoot()
+                enemy.update_bullets()
 
             for bullet in player.bullets:
                 for enemy in enemies:
@@ -114,7 +117,14 @@ class Game:
                         enemies.remove(enemy)
                         score += 1
                         break
-
+            for enemy in enemies:            
+                for bullet in enemy.bullets:    
+                    if bullet.colliderect(
+                        pygame.Rect(player.x, player.y, spaceship_width, spaceship_height)
+                    ):
+                        enemy.bullets.remove(bullet)
+                        if player.lose_health():
+                            running = False  
             for enemy in enemies:
                 if enemy.rect.colliderect(
                     pygame.Rect(player.x, player.y, spaceship_width, spaceship_height)
