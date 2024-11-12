@@ -13,24 +13,28 @@ class Player:
         self.can_shoot = True
 
         # Load player image
-        self.image = pygame.image.load(
-            "player.png"
-        ).convert_alpha()  # Ensure this path is correct
+        self.image = pygame.image.load("player.png").convert_alpha()
         self.width = self.image.get_width()
         self.height = self.image.get_height()
 
         # Load bullet image
-        self.bullet_image = pygame.image.load(
-            "bullets.png"
-        ).convert_alpha()  # Ensure this path is correct
+        self.bullet_image = pygame.image.load("bullets.png").convert_alpha()
         self.bullet_width = self.bullet_image.get_width()
         self.bullet_height = self.bullet_image.get_height()
 
     def move(self, keys):
+        # Di chuyển sang trái nếu nhấn phím LEFT và chưa chạm biên trái
         if keys[pygame.K_LEFT] and self.x > 0:
             self.x -= self.speed
+        # Di chuyển sang phải nếu nhấn phím RIGHT và chưa chạm biên phải
         if keys[pygame.K_RIGHT] and self.x < screen_width - self.width:
             self.x += self.speed
+        # Di chuyển lên nếu nhấn phím UP và chưa chạm biên trên
+        if keys[pygame.K_UP] and self.y > 0:
+            self.y -= self.speed
+        # Di chuyển xuống nếu nhấn phím DOWN và chưa chạm biên dưới
+        if keys[pygame.K_DOWN] and self.y < screen_height - self.height:
+            self.y += self.speed
 
     def shoot(self):
         if self.can_shoot:
