@@ -10,6 +10,7 @@ def new_formation():
         return formation2()
     if x==3:
         return formation3()
+
 def formation1():
     formation = []
     x=random.randint(screen_width // 4,(screen_width // 4) * 3)
@@ -31,6 +32,7 @@ def formation1():
             
 
     return formation
+
 def formation2():
     formation = []
     x=0

@@ -4,8 +4,8 @@ from constants import *
 
 
 class Enemy:
+    # Thêm kẻ địch tại vị trí x,y. Status: Trạng thái kẻ địch (0: kẻ địch tự do; 1,2,3: kẻ địch thuộc đội ình 1,2,3)
     def __init__(self,enemy_x,enemy_y,status):
-        # Initialize enemy position at a random horizontal location above the screen
         self.rect = pygame.Rect(enemy_x,enemy_y,enemy_width,enemy_height)
         self.in_formation=status
         # Load enemy image
@@ -16,7 +16,7 @@ class Enemy:
         self.bullet_height = self.bullet_image.get_height()
 
     def move(self):
-        # Move the enemy downwards
+        # cách kẻ địch di chuyển
         if self.in_formation == 0 or self.in_formation == 1:
             self.rect.y += enemy_speed
         if self.in_formation == 2:
