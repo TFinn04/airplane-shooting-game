@@ -14,7 +14,7 @@ def new_formation():
 def formation1():
     formation = []
     x=random.randint(screen_width // 4,(screen_width // 4) * 3)
-    y=random.randint(2,4)
+    y=random.randint(2,6)
     pos=0
     
     layers=random.randint(0,3)
@@ -50,7 +50,7 @@ def formation3():
     
     layers=random.randint(100,400)
         
-    for i in range (10):
+    for i in range (random.randint(5,10)):
         for layer in range(0,layers,enemy_height*2):
             formation.append(Enemy(-enemy_width*i,layer,3))
             formation.append(Enemy(screen_width+enemy_width*i,layer+enemy_height,-3))

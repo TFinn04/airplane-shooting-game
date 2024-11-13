@@ -107,7 +107,7 @@ class Game:
             for enemy in enemies:
                 enemy.move()
                 enemy.draw(screen)
-                if (random.randint(0,300)==0):
+                if (random.randint(0,400)==0):
                     enemy.shoot()
                 enemy.update_bullets()
 
