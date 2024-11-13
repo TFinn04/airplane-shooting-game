@@ -4,10 +4,10 @@ from constants import *
 
 
 class Enemy:
-    def __init__(self):
+    def __init__(self,enemy_x,enemy_y,status):
         # Initialize enemy position at a random horizontal location above the screen
-        self.rect = pygame.Rect(random.randint(0, screen_width - enemy_width),-enemy_height,enemy_width,enemy_height)
-        
+        self.rect = pygame.Rect(enemy_x,enemy_y,enemy_width,enemy_height)
+        self.in_formation=status
         # Load enemy image
         self.image = pygame.image.load("enemy.png").convert_alpha()
         self.bullets =[]
@@ -17,7 +17,18 @@ class Enemy:
 
     def move(self):
         # Move the enemy downwards
-        self.rect.y += enemy_speed
+        if self.in_formation == 0 or self.in_formation == 1:
+            self.rect.y += enemy_speed
+        if self.in_formation == 2:
+            self.rect.x += enemy_speed
+            self.rect.y += enemy_speed//1.75
+        if self.in_formation == -2:
+            self.rect.x -= enemy_speed
+            self.rect.y += enemy_speed//1.75
+        if self.in_formation == 3:
+            self.rect.x += enemy_speed
+        if self.in_formation == -3:
+            self.rect.x -= enemy_speed
 
     def draw(self, screen):
         # Draw the enemy image

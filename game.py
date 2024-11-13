@@ -4,7 +4,7 @@ from enemy import Enemy
 from high_score_manager import HighScoreManager
 from constants import *
 import random
-
+from enemy_formation import *
 
 class Game:
     def __init__(self):
@@ -101,12 +101,13 @@ class Game:
             player.update_bullets()
 
             if random.randint(0, 50) == 0:
-                enemies.append(Enemy())
-
+                enemies.append(Enemy(random.randint(0,screen_width-enemy_width),-enemy_height,0))
+            if random.randint(0,300) ==0:
+                enemies = enemies + new_formation()
             for enemy in enemies:
                 enemy.move()
                 enemy.draw(screen)
-                if (random.randint(0,150)==0):
+                if (random.randint(0,300)==0):
                     enemy.shoot()
                 enemy.update_bullets()
 
@@ -128,10 +129,11 @@ class Game:
             for enemy in enemies:
                 if enemy.rect.colliderect(
                     pygame.Rect(player.x, player.y, spaceship_width, spaceship_height)
-                ):
+                ):    
                     enemies.remove(enemy)
                     if player.lose_health():
                         running = False
+                
 
             enemies = [enemy for enemy in enemies if enemy.rect.y < screen_height]
 
