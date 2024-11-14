@@ -1,9 +1,9 @@
 import pygame
-from constants import *  # Ensure you import necessary constants
+from constants import *
 
 
 class Player:
-    def __init__(self):
+    def __init__(self, screen_width, screen_height):
         self.x = screen_width // 2
         self.y = screen_height - spaceship_height - 10
         self.speed = spaceship_speed
@@ -12,28 +12,28 @@ class Player:
         self.lives = lives
         self.can_shoot = True
 
-        # Load player image
+        # Load hình ảnh người chơi
         self.image = pygame.image.load("player.png").convert_alpha()
         self.width = self.image.get_width()
         self.height = self.image.get_height()
 
-        # Load bullet image
+        # Load hình ảnh đạn
         self.bullet_image = pygame.image.load("bullets.png").convert_alpha()
         self.bullet_width = self.bullet_image.get_width()
         self.bullet_height = self.bullet_image.get_height()
 
+        self.screen_width = screen_width
+        self.screen_height = screen_height
+
     def move(self, keys):
-        # Di chuyển sang trái nếu nhấn phím LEFT và chưa chạm biên trái
+        # Di chuyển nếu phím tương ứng được bấm và đang không ở rìa màn hình
         if keys[pygame.K_LEFT] and self.x > 0:
             self.x -= self.speed
-        # Di chuyển sang phải nếu nhấn phím RIGHT và chưa chạm biên phải
-        if keys[pygame.K_RIGHT] and self.x < screen_width - self.width:
+        if keys[pygame.K_RIGHT] and self.x < self.screen_width - self.width:
             self.x += self.speed
-        # Di chuyển lên nếu nhấn phím UP và chưa chạm biên trên
         if keys[pygame.K_UP] and self.y > 0:
             self.y -= self.speed
-        # Di chuyển xuống nếu nhấn phím DOWN và chưa chạm biên dưới
-        if keys[pygame.K_DOWN] and self.y < screen_height - self.height:
+        if keys[pygame.K_DOWN] and self.y < self.screen_height - self.height:
             self.y += self.speed
 
     def shoot(self):
@@ -45,17 +45,17 @@ class Player:
                 self.bullet_height,
             )
             self.bullets.append(bullet)
-            self.can_shoot = False  # Prevent further shooting until key is released
+            self.can_shoot = False  # Chỉ được bắn tiếp khi thả nút
 
     def draw(self, screen):
-        # Draw the player image
+        # Vẽ hình ảnh người chơi lên màn hình
         screen.blit(self.image, (self.x, self.y))
 
-        # Draw bullets using the bullet image
+        # Vẽ hình ảnh của đạn
         for bullet in self.bullets:
             screen.blit(self.bullet_image, (bullet.x, bullet.y))
 
-        # Draw health bar
+        # Hiện thanh máu
         pygame.draw.rect(screen, green, (10, 50, self.health * 2, 20))
 
     def update_bullets(self):
@@ -63,7 +63,7 @@ class Player:
             bullet.y -= bullet_speed
         self.bullets = [
             bullet for bullet in self.bullets if bullet.y > 0
-        ]  # Remove off-screen bullets
+        ]  # Loại bỏ đạn nếu đã đi hết hành trình
 
     def lose_health(self):
         self.health -= damage_per_collision
@@ -71,5 +71,5 @@ class Player:
             self.lives -= 1
             self.health = max_health
             if self.lives <= 0:
-                return True  # Player is out of lives
-        return False  # Player is still alive
+                return True  # Người chơi hết mạng
+        return False  # Người chơi vẫn còn sống

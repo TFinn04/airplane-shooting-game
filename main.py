@@ -5,14 +5,14 @@ from constants import *
 if __name__ == "__main__":
     pygame.init()
 
-    # Tao cua so
+    # Tạo cửa sổ
     screen = pygame.display.set_mode((screen_width, screen_height))
 
-    # Khoi tao tien trinh game
+    # Khởi động tiến trình
     game = Game()
 
-    # Chay game
-    game.run(screen)
+    # Chạy game
+    game.game_loop(screen)
 
-    # Thoat game
+    # Thoát
     pygame.quit()

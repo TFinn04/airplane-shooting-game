@@ -1,44 +1,42 @@
-import pygame
+import json
 
-# Khoi tao font
-pygame.font.init()
 
-# Dinh dang cua so
-screen_width = 800
-screen_height = 600
+# Load configuration from config.json
+def load_config():
+    with open("config.json", "r") as file:
+        return json.load(file)
 
-# Mau sac
+
+# Load the configuration
+config = load_config()
+
+# Game configuration (moved from constants)
+screen_width = config["screen_width"]
+screen_height = config["screen_height"]
+
+# Colors (constants, no need to load from config)
 black = (0, 0, 0)
 white = (255, 255, 255)
 red = (255, 0, 0)
 green = (0, 255, 0)
 
-# Dinh dang may bay
-spaceship_width = 50
-spaceship_height = 60
-spaceship_speed = 5
+# Player statistics
+spaceship_width = config["spaceship_width"]
+spaceship_height = config["spaceship_height"]
+spaceship_speed = config["spaceship_speed"]
+max_health = config["max_health"]
+lives = config["lives"]
 
-# Dinh dang dan
-bullet_speed = 7
-bullet_width = 5
-bullet_height = 10
+# Bullet statistics
+bullet_speed = config["bullet_speed"]
+bullet_width = config["bullet_width"]
+bullet_height = config["bullet_height"]
 
-# Dinh dang ke dich
-enemy_speed = 3
-enemy_width = 50
-enemy_height = 50
+# Enemy statistics
+enemy_width = config["enemy_width"]
+enemy_height = config["enemy_height"]
+enemy_speed = config["enemy_speed"]
+enemy_bullet_speed = config["enemy_bullet_speed"]
 
-# Cau hinh chi so game
-max_health = 100
-damage_per_collision = 20
-lives = 3
-
-# Font and clock
-font = pygame.font.SysFont(None, 35)
-clock = pygame.time.Clock()
-high_score_file = "high_score.txt"
-
-# Load hinh anh
-player_image = pygame.image.load("player.png")
-enemy_image = pygame.image.load("enemy.png")
-bullet_image = pygame.image.load("bullets.png")
+# Damage per collision
+damage_per_collision = config["damage_per_collision"]
