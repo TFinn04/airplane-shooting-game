@@ -14,7 +14,7 @@
   "enemy_height": 50,
   "enemy_speed": 2,
   "enemy_shoot_delay": 1500,
-  "damage_per_collision": 10,
+  "damage_per_collision": 20,
   "enemy_spawn_delay": 1500,
   "enemy_bullet_speed": 4,
   "item_drop_interval": 15000,
