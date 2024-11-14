@@ -14,10 +14,10 @@ class Enemy:
         )
 
         # Load ảnh kẻ địch
-        self.image = pygame.image.load("enemy.png").convert_alpha()
+        self.image = pygame.image.load("Images/enemy.png").convert_alpha()
         self.bullets = []
         self.bullet_image = pygame.image.load(
-            "enemy_bullet.png"
+            "Images/enemy_bullet.png"
         ).convert_alpha()  # Ensure this path is correct
         self.bullet_width = self.bullet_image.get_width()
         self.bullet_height = self.bullet_image.get_height()

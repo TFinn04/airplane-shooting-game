@@ -1,4 +1,5 @@
 {
+  "_comment": "Chú thích sau này sẽ làm :v",
   "screen_width": 800,
   "screen_height": 600,
   "spaceship_speed": 5,
@@ -15,5 +16,9 @@
   "enemy_shoot_delay": 1500,
   "damage_per_collision": 10,
   "enemy_spawn_delay": 1500,
-  "enemy_bullet_speed": 4
+  "enemy_bullet_speed": 4,
+  "item_drop_interval": 15000,
+  "regen_amount": 50,
+  "shield_amount": 50,
+  "max_shield": 100
 }
