@@ -5,6 +5,7 @@ from high_score_manager import HighScoreManager
 from constants import *
 import random
 from enemy_formation import *
+from drop_item import DropItem  # Import DropItem
 
 
 class Game:
@@ -13,11 +14,23 @@ class Game:
         self.background_image = pygame.image.load(
             "Images/background.png"
         ).convert()  # Load your background image
+        self.item_drop_interval = config["item_drop_interval"]  # Set item drop interval
+        self.last_item_drop_time = pygame.time.get_ticks()
+        self.items = []  # Initialize list for items
 
     def draw_text(self, text, x, y, screen, color=white):
         font = pygame.font.SysFont("Arial", 35)
         screen_text = font.render(text, True, color)
         screen.blit(screen_text, [x, y])
+
+    def apply_item_effect(self, player, item):
+        """Apply the effect of the item to the player"""
+        if item.effect == "regen":
+            player.health = min(player.health + regen_amount, max_health)
+        elif item.effect == "shield":
+            player.shield = min(player.shield + shield_amount, max_shield)
+        elif item.effect == "destroy_enemies":
+            self.enemies.clear()  # Clear all enemies if item effect is destroy_enemies
 
     def start_menu(self, screen):
         menu_running = True
@@ -103,14 +116,26 @@ class Game:
 
             player.update_bullets()
 
+            # Spawn enemies at intervals
             if random.randint(0, 50) == 0:
                 enemies.append(
                     Enemy(
                         random.randint(0, screen_width - enemy_width), -enemy_height, 0
                     )
                 )
+
+            # Spawn enemies in formations
             if random.randint(0, 300) == 0:
                 enemies = enemies + new_formation()
+
+            # Drop items at regular intervals
+            current_time = pygame.time.get_ticks()
+            if current_time - self.last_item_drop_time > self.item_drop_interval:
+                new_item = DropItem(screen_width, screen_height)
+                self.items.append(new_item)
+                self.last_item_drop_time = current_time
+
+            # Move and display enemies
             for enemy in enemies:
                 enemy.move()
                 enemy.draw(screen)
@@ -118,6 +143,7 @@ class Game:
                     enemy.shoot()
                 enemy.update_bullets()
 
+            # Check for bullet-enemy collision
             for bullet in player.bullets:
                 for enemy in enemies:
                     if bullet.colliderect(enemy.rect):
@@ -125,6 +151,8 @@ class Game:
                         enemies.remove(enemy)
                         score += 1
                         break
+
+            # Check for bullet-enemy bullet collision
             for enemy in enemies:
                 for bullet in enemy.bullets:
                     if bullet.colliderect(
@@ -135,6 +163,8 @@ class Game:
                         enemy.bullets.remove(bullet)
                         if player.lose_health():
                             running = False
+
+            # Check for player-enemy collision
             for enemy in enemies:
                 if enemy.rect.colliderect(
                     pygame.Rect(player.x, player.y, spaceship_width, spaceship_height)
@@ -143,9 +173,20 @@ class Game:
                     if player.lose_health():
                         running = False
 
+            # Check for player-item collision
+            for item in self.items[:]:
+                if player.rect.colliderect(item.rect):
+                    self.apply_item_effect(player, item)
+                    self.items.remove(item)
+
+            # Remove enemies that are off-screen
             enemies = [enemy for enemy in enemies if enemy.rect.y < screen_height]
 
+            # Draw player, items, and score
             player.draw(screen)
+            for item in self.items:
+                item.move()
+                item.draw(screen)
 
             self.draw_text(f"Score: {score}", 10, 10, screen)
             self.draw_text(f"Lives: {player.lives}", 10, 80, screen)
