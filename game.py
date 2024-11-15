@@ -4,7 +4,7 @@ from drop_item import DropItem
 from player import Player
 from enemy import Enemy
 from high_score_manager import HighScoreManager
-from constants import *  # Import các hằng số từ constants.py
+from constants import *  # Import constants
 
 
 class Game:
@@ -36,7 +36,10 @@ class Game:
         screen_width = screen.get_width()
         screen_height = screen.get_height()
 
+        # Initialize/reset player, enemies, items, and score for each new game
         player = Player(screen_width, screen_height)
+        self.enemies = []  # Clear previous enemies
+        self.items = []  # Clear previous items
         score = 0
         running = True
 
@@ -59,6 +62,7 @@ class Game:
 
             player.update_bullets()
 
+            # Spawn enemies and items at intervals
             current_time = pygame.time.get_ticks()
             if current_time - self.last_spawn_time > self.spawn_delay:
                 self.enemies.append(Enemy())
@@ -68,6 +72,7 @@ class Game:
                 self.items.append(new_item)
                 self.last_item_drop_time = current_time
 
+            # Move and display enemies and bullets
             for enemy in self.enemies:
                 enemy.move()
                 enemy.draw(screen)
@@ -75,11 +80,13 @@ class Game:
                     enemy.shoot()
                 enemy.update_bullets()
 
+            # Check for player-item collision
             for item in self.items[:]:
                 if player.rect.colliderect(item.rect):
                     self.apply_item_effect(player, item)
                     self.items.remove(item)
 
+            # Handle bullet-enemy collision
             for bullet in player.bullets[:]:
                 for enemy in self.enemies[:]:
                     if bullet.colliderect(enemy.rect):
@@ -88,6 +95,7 @@ class Game:
                         score += 1
                         break
 
+            # Handle enemy bullet-player collision
             for enemy in self.enemies:
                 for bullet in enemy.bullets[:]:
                     if bullet.colliderect(player.rect):
@@ -95,12 +103,14 @@ class Game:
                         if player.lose_health():
                             running = False
 
+            # Handle player-enemy collision
             for enemy in self.enemies[:]:
                 if enemy.rect.colliderect(player.rect):
                     self.enemies.remove(enemy)
                     if player.lose_health():
                         running = False
 
+            # Draw player, items, and score
             player.draw(screen)
             for item in self.items:
                 item.move()
