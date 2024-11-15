@@ -4,6 +4,7 @@ from constants import *
 
 
 class Enemy:
+<<<<<<< HEAD
     # Thêm kẻ địch tại vị trí x,y. Status: Trạng thái kẻ địch (0: kẻ địch tự do; 1,2,3: kẻ địch thuộc đội ình 1,2,3)
     def __init__(self,enemy_x,enemy_y,status):
         self.rect = pygame.Rect(enemy_x,enemy_y,enemy_width,enemy_height)
@@ -12,10 +13,28 @@ class Enemy:
         self.image = pygame.image.load("enemy.png").convert_alpha()
         self.bullets =[]
         self.bullet_image = pygame.image.load("enemy_bullet.png").convert_alpha()  # Ensure this path is correct
+=======
+    def __init__(self):
+        # Spawn kẻ địch ngẫu nhiên
+        self.rect = pygame.Rect(
+            random.randint(0, screen_width - enemy_width),
+            -enemy_height,
+            enemy_width,
+            enemy_height,
+        )
+
+        # Load ảnh kẻ địch
+        self.image = pygame.image.load("Images/enemy.png").convert_alpha()
+        self.bullets = []
+        self.bullet_image = pygame.image.load(
+            "Images/enemy_bullet.png"
+        ).convert_alpha()  # Ensure this path is correct
+>>>>>>> e35630ad8b994154fd98b6feacf45a83fe67ec98
         self.bullet_width = self.bullet_image.get_width()
         self.bullet_height = self.bullet_image.get_height()
 
     def move(self):
+<<<<<<< HEAD
         # cách kẻ địch di chuyển
         if self.in_formation == 0 or self.in_formation == 1:
             self.rect.y += enemy_speed
@@ -29,14 +48,19 @@ class Enemy:
             self.rect.x += enemy_speed
         if self.in_formation == -3:
             self.rect.x -= enemy_speed
+=======
+        # Kẻ địch di chuyển xuống
+        self.rect.y += enemy_speed
+>>>>>>> e35630ad8b994154fd98b6feacf45a83fe67ec98
 
     def draw(self, screen):
-        # Draw the enemy image
+        # Hiển thị kẻ địch
         screen.blit(self.image, (self.rect.x, self.rect.y))
         for bullet in self.bullets:
             screen.blit(self.bullet_image, (bullet.x, bullet.y))
+
     def shoot(self):
-        
+
         bullet = pygame.Rect(
             self.rect.x + enemy_width // 2 - self.bullet_width // 2,
             self.rect.y,
@@ -44,10 +68,10 @@ class Enemy:
             self.bullet_height,
         )
         self.bullets.append(bullet)
+
     def update_bullets(self):
         for bullet in self.bullets:
-            bullet.y += bullet_speed
+            bullet.y += enemy_bullet_speed
         self.bullets = [
             bullet for bullet in self.bullets if bullet.y > 0
-        ]  # Remove off-screen bullets        
-
+        ]  # Loại bỏ đạn bay hết hành trình

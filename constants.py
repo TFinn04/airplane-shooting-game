@@ -1,44 +1,50 @@
-import pygame
+import json
 
-# Khoi tao font
-pygame.font.init()
 
-# Dinh dang cua so
-screen_width = 800
-screen_height = 600
+# Tải cấu hình từ file config.json
+def load_config():
+    with open("config.json", "r") as file:
+        return json.load(file)
 
-# Mau sac
-black = (0, 0, 0)
-white = (255, 255, 255)
-red = (255, 0, 0)
-green = (0, 255, 0)
 
-# Dinh dang may bay
-spaceship_width = 50
-spaceship_height = 60
-spaceship_speed = 5
+# Tải cấu hình trò chơi từ config.json
+config = load_config()
 
-# Dinh dang dan
-bullet_speed = 7
-bullet_width = 5
-bullet_height = 10
+# Cấu hình trò chơi (được di chuyển từ các hằng số)
+screen_width = config["screen_width"]  # Chiều rộng màn hình
+screen_height = config["screen_height"]  # Chiều cao màn hình
 
-# Dinh dang ke dich
-enemy_speed = 3
-enemy_width = 50
-enemy_height = 50
+# Các màu sắc (hằng số, không cần tải từ cấu hình)
+black = (0, 0, 0)  # Màu đen
+white = (255, 255, 255)  # Màu trắng
+red = (255, 0, 0)  # Màu đỏ
+green = (0, 255, 0)  # Màu xanh lá
 
-# Cau hinh chi so game
-max_health = 100
-damage_per_collision = 20
-lives = 3
+# Thống kê của người chơi
+spaceship_width = config["spaceship_width"]  # Chiều rộng tàu không gian
+spaceship_height = config["spaceship_height"]  # Chiều cao tàu không gian
+spaceship_speed = config["spaceship_speed"]  # Tốc độ di chuyển của tàu
+max_health = config["max_health"]  # Sức khỏe tối đa của người chơi
+lives = config["lives"]  # Số mạng của người chơi
 
-# Font and clock
-font = pygame.font.SysFont(None, 35)
-clock = pygame.time.Clock()
-high_score_file = "high_score.txt"
+# Thống kê của đạn
+bullet_speed = config["bullet_speed"]  # Tốc độ di chuyển của đạn
+bullet_width = config["bullet_width"]  # Chiều rộng của đạn
+bullet_height = config["bullet_height"]  # Chiều cao của đạn
 
-# Load hinh anh
-player_image = pygame.image.load("player.png")
-enemy_image = pygame.image.load("enemy.png")
-bullet_image = pygame.image.load("bullets.png")
+# Thống kê của kẻ thù
+enemy_width = config["enemy_width"]  # Chiều rộng của kẻ thù
+enemy_height = config["enemy_height"]  # Chiều cao của kẻ thù
+enemy_speed = config["enemy_speed"]  # Tốc độ di chuyển của kẻ thù
+enemy_bullet_speed = config["enemy_bullet_speed"]  # Tốc độ đạn của kẻ thù
+
+# Sát thương mỗi lần va chạm
+damage_per_collision = config["damage_per_collision"]  # Sát thương khi va chạm
+
+# Các hằng số liên quan đến vật phẩm
+item_drop_interval = config[
+    "item_drop_interval"
+]  # Khoảng thời gian giữa các lần thả vật phẩm
+shield_amount = config["shield_amount"]  # Số lượng khiên mà vật phẩm cung cấp
+max_shield = config["max_shield"]  # Số lượng khiên tối đa
+regen_amount = config["regen_amount"]  # Số lượng hồi phục khi vật phẩm hồi máu
