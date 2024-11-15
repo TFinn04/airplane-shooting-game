@@ -168,7 +168,7 @@ class Game:
             self.spawn_meteor()
             self.update_meteors(screen)
             self.check_meteor_collisions(player, enemies)
-            pygame.display.flip()
+
 
             # Loại bỏ kẻ thù ra khỏi màn hình
             enemies = [enemy for enemy in enemies if enemy.rect.y < screen_height]
