@@ -65,7 +65,15 @@ class Game:
             # Spawn enemies and items at intervals
             current_time = pygame.time.get_ticks()
             if current_time - self.last_spawn_time > self.spawn_delay:
-                self.enemies.append(Enemy())
+                # Provide random x, y positions and a random status for the enemy
+                enemy_x = random.randint(0, screen_width - enemy_width)
+                enemy_y = random.randint(-100, -enemy_height)  # Start above the screen
+                status = random.choice(
+                    [0, 1, 2, 3, -1, -2, -3]
+                )  # Random enemy formation status
+                self.enemies.append(
+                    Enemy(enemy_x, enemy_y, status)
+                )  # Pass values to the Enemy constructor
                 self.last_spawn_time = current_time
             if current_time - self.last_item_drop_time > self.item_drop_interval:
                 new_item = DropItem(screen_width, screen_height)

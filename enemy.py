@@ -4,16 +4,11 @@ from constants import *
 
 
 class Enemy:
-    def __init__(self):
-        # Spawn kẻ địch ngẫu nhiên
-        self.rect = pygame.Rect(
-            random.randint(0, screen_width - enemy_width),
-            -enemy_height,
-            enemy_width,
-            enemy_height,
-        )
-
-        # Load ảnh kẻ địch
+    # Thêm kẻ địch tại vị trí x,y. Status: Trạng thái kẻ địch (0: kẻ địch tự do; 1,2,3: kẻ địch thuộc đội ình 1,2,3)
+    def __init__(self, enemy_x, enemy_y, status):
+        self.rect = pygame.Rect(enemy_x, enemy_y, enemy_width, enemy_height)
+        self.in_formation = status
+        # Load enemy image
         self.image = pygame.image.load("Images/enemy.png").convert_alpha()
         self.bullets = []
         self.bullet_image = pygame.image.load(
@@ -23,8 +18,19 @@ class Enemy:
         self.bullet_height = self.bullet_image.get_height()
 
     def move(self):
-        # Kẻ địch di chuyển xuống
-        self.rect.y += enemy_speed
+        # cách kẻ địch di chuyển
+        if self.in_formation == 0 or self.in_formation == 1:
+            self.rect.y += enemy_speed
+        if self.in_formation == 2:
+            self.rect.x += enemy_speed
+            self.rect.y += enemy_speed // 1.75
+        if self.in_formation == -2:
+            self.rect.x -= enemy_speed
+            self.rect.y += enemy_speed // 1.75
+        if self.in_formation == 3:
+            self.rect.x += enemy_speed
+        if self.in_formation == -3:
+            self.rect.x -= enemy_speed
 
     def draw(self, screen):
         # Hiển thị kẻ địch
