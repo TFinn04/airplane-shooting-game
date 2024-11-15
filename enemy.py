@@ -4,6 +4,16 @@ from constants import *
 
 
 class Enemy:
+<<<<<<< HEAD
+    # Thêm kẻ địch tại vị trí x,y. Status: Trạng thái kẻ địch (0: kẻ địch tự do; 1,2,3: kẻ địch thuộc đội ình 1,2,3)
+    def __init__(self,enemy_x,enemy_y,status):
+        self.rect = pygame.Rect(enemy_x,enemy_y,enemy_width,enemy_height)
+        self.in_formation=status
+        # Load enemy image
+        self.image = pygame.image.load("enemy.png").convert_alpha()
+        self.bullets =[]
+        self.bullet_image = pygame.image.load("enemy_bullet.png").convert_alpha()  # Ensure this path is correct
+=======
     def __init__(self):
         # Spawn kẻ địch ngẫu nhiên
         self.rect = pygame.Rect(
@@ -19,12 +29,29 @@ class Enemy:
         self.bullet_image = pygame.image.load(
             "Images/enemy_bullet.png"
         ).convert_alpha()  # Ensure this path is correct
+>>>>>>> e35630ad8b994154fd98b6feacf45a83fe67ec98
         self.bullet_width = self.bullet_image.get_width()
         self.bullet_height = self.bullet_image.get_height()
 
     def move(self):
+<<<<<<< HEAD
+        # cách kẻ địch di chuyển
+        if self.in_formation == 0 or self.in_formation == 1:
+            self.rect.y += enemy_speed
+        if self.in_formation == 2:
+            self.rect.x += enemy_speed
+            self.rect.y += enemy_speed//1.75
+        if self.in_formation == -2:
+            self.rect.x -= enemy_speed
+            self.rect.y += enemy_speed//1.75
+        if self.in_formation == 3:
+            self.rect.x += enemy_speed
+        if self.in_formation == -3:
+            self.rect.x -= enemy_speed
+=======
         # Kẻ địch di chuyển xuống
         self.rect.y += enemy_speed
+>>>>>>> e35630ad8b994154fd98b6feacf45a83fe67ec98
 
     def draw(self, screen):
         # Hiển thị kẻ địch

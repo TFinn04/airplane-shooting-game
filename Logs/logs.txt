@@ -1,2 +1,7 @@
+<<<<<<< HEAD
+12/11/2024: kẻ địch bắn trả
+13/11/2024: thêm đội hình kẻ địch
+=======
 Friday, November 15, 2024 12:58:04 AM: Thêm file config.json để chỉnh sửa các chỉ số.
 Friday, November 15, 2024 3:12:44 AM: Drop item
+>>>>>>> e35630ad8b994154fd98b6feacf45a83fe67ec98
