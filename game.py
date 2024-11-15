@@ -92,6 +92,13 @@ class Game:
     def game_loop(self, screen):
         player = Player(screen_width, screen_height)
         enemies = []
+    def game_loop(self, screen, spaceship_data):
+        clock = pygame.time.Clock()
+        screen_width = screen.get_width()
+        screen_height = screen.get_height()
+
+        # Khởi tạo người chơi với dữ liệu máy bay được chọn
+        player = Player(spaceship_data, screen_width, screen_height)
         score = 0
         running = True
 
