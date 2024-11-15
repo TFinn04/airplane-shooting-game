@@ -20,5 +20,28 @@
   "item_drop_interval": 15000,
   "regen_amount": 50,
   "shield_amount": 50,
-  "max_shield": 100
+  "max_shield": 100,
+  "spaceships": [
+    {
+      "name": "Falcon",
+      "image": "Images/Falcon.png",
+      "hp": 100,
+      "damage": 10,
+      "speed": 5
+    },
+    {
+      "name": "Eagle",
+      "image": "Images/Eagle.png",
+      "hp": 120,
+      "damage": 8,
+      "speed": 4
+    },
+    {
+      "name": "Hawk",
+      "image": "Images/Hawk.png",
+      "hp": 80,
+      "damage": 12,
+      "speed": 6
+    }
+  ]
 }
