@@ -31,15 +31,13 @@ class Game:
         elif item.effect == "destroy_enemies":
             self.enemies.clear()
 
-    def game_loop(self, screen):
+    def game_loop(self, screen, spaceship_data):
         clock = pygame.time.Clock()
         screen_width = screen.get_width()
         screen_height = screen.get_height()
 
-        # Initialize/reset player, enemies, items, and score for each new game
-        player = Player(screen_width, screen_height)
-        self.enemies = []  # Clear previous enemies
-        self.items = []  # Clear previous items
+        # Khởi tạo người chơi với dữ liệu máy bay được chọn
+        player = Player(spaceship_data, screen_width, screen_height)
         score = 0
         running = True
 
