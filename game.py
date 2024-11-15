@@ -23,14 +23,14 @@ class Game:
         screen_text = font.render(text, True, color)
         screen.blit(screen_text, [x, y])
 
-    def apply_item_effect(self, player, item):
+    def apply_item_effect(self, player, item, enemies):
         """Apply the effect of the item to the player"""
         if item.effect == "regen":
             player.health = min(player.health + regen_amount, max_health)
         elif item.effect == "shield":
             player.shield = min(player.shield + shield_amount, max_shield)
         elif item.effect == "destroy_enemies":
-            self.enemies.clear()  # Clear all enemies if item effect is destroy_enemies
+            enemies.clear()  # Clear all enemies if item effect is destroy_enemies
 
     def start_menu(self, screen):
         menu_running = True
@@ -176,7 +176,7 @@ class Game:
             # Check for player-item collision
             for item in self.items[:]:
                 if player.rect.colliderect(item.rect):
-                    self.apply_item_effect(player, item)
+                    self.apply_item_effect(player, item, enemies)
                     self.items.remove(item)
 
             # Remove enemies that are off-screen
@@ -260,15 +260,6 @@ class Game:
                 game_over_choice = self.game_over_menu(score, screen)
                 if game_over_choice == "retry":
                     continue
-                else:
-                    break
+
             elif choice == "high_score":
                 self.show_high_score(screen)
-
-
-if __name__ == "__main__":
-    pygame.init()
-    screen = pygame.display.set_mode((screen_width, screen_height))
-    game = Game()
-    game.run(screen)
-    pygame.quit()
