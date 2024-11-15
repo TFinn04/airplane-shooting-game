@@ -194,62 +194,32 @@ class Game:
             pygame.display.flip()
             clock.tick(60)
 
+        self.display_score(screen, score)
         return score
 
-    def game_over_menu(self, score, screen):
-        high_score = self.high_score_manager.high_score
-        if score > high_score:
-            high_score = score
-            self.high_score_manager.save_high_score(score)
+    def display_score(self, screen, score):
+        """Display the score after game over"""
+        screen.fill(black)
+        self.draw_text(f"Game Over", screen.get_width() // 2 - 100, 100, screen)
+        self.draw_text(f"Score: {score}", screen.get_width() // 2 - 100, 200, screen)
+        self.draw_text(
+            "Press M to return to Main Menu", screen.get_width() // 2 - 200, 300, screen
+        )
+        pygame.display.flip()
 
-        game_over_running = True
-        while game_over_running:
-            screen.blit(self.background_image, (0, 0))  # Draw background
-            self.draw_text("Game Over!", screen_width // 2 - 100, 100, screen)
-            self.draw_text(f"Your Score: {score}", screen_width // 2 - 100, 200, screen)
-            self.draw_text(
-                f"High Score: {high_score}", screen_width // 2 - 100, 250, screen
-            )
-            self.draw_text("1. Retry", screen_width // 2 - 50, 300, screen)
-            self.draw_text("2. Quit", screen_width // 2 - 50, 350, screen)
-            pygame.display.flip()
-
+        # Wait for user input to return to the main menu
+        waiting_for_input = True
+        while waiting_for_input:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     quit()
-
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_1:
-                        return "retry"
-                    if event.key == pygame.K_2:
-                        pygame.quit()
+                elif event.type == pygame.KEYUP:
+                    if event.key == pygame.K_m:
+                        waiting_for_input = False  # Exit loop and return to main menu
+                    elif event.key == pygame.K_q:
+                        pygame.quit()  # Quit the game if 'Q' is pressed
                         quit()
-
-    def show_high_score(self, screen):
-        high_score_running = True
-        while high_score_running:
-            screen.blit(self.background_image, (0, 0))  # Draw background
-            self.draw_text(
-                f"High Score: {self.high_score_manager.high_score}",
-                screen_width // 2 - 100,
-                200,
-                screen,
-            )
-            self.draw_text(
-                "Press any key to return to the menu",
-                screen_width // 2 - 150,
-                300,
-                screen,
-            )
-            pygame.display.flip()
-
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    quit()
-                if event.type == pygame.KEYDOWN:
-                    return
 
     def run(self, screen):
         while True:

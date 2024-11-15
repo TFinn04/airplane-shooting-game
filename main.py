@@ -79,6 +79,9 @@ if __name__ == "__main__":
             result = game.game_loop(screen)
             if result == "exit":
                 break
+            elif result == "game_over":
+                # Wait for user input after game over
+                continue  # Return to main menu after key press
         elif action == "show_high_score":
             result = show_high_score(screen, high_score_manager)
             if result == "exit":
