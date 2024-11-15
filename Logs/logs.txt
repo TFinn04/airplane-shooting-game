@@ -2,3 +2,4 @@
 13/11/2024: thêm đội hình kẻ địch
 Friday, November 15, 2024 12:58:04 AM: Thêm file config.json để chỉnh sửa các chỉ số.
 Friday, November 15, 2024 3:12:44 AM: Drop item
+Friday, November 15, 2024 Thêm thiên thạch 
