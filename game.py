@@ -6,17 +6,44 @@ from constants import *
 import random
 from enemy_formation import *
 from drop_item import DropItem  # Import DropItem
+import time
 
+class Meteor:
+    def __init__(self, screen_width, screen_height):
+        self.image = pygame.image.load("Images/meteor.png").convert_alpha()
+        self.rect = self.image.get_rect()
+        self.rect.x = random.randint(0, max(0, screen_width - self.rect.width))
+        self.rect.y = -self.rect.height
+        self.speed_y = random.randint(5, 10)  # Tốc độ rơi dọc (Y)
+        self.speed_x = random.choice([-1, 1]) * random.randint(3, 7)  # Tốc độ ngang (X)
 
+    def move(self):
+        self.rect.y += self.speed_y  # Di chuyển theo trục Y
+        self.rect.x += self.speed_x  # Di chuyển theo trục X
+
+        # Đảo chiều nếu thiên thạch chạm rìa màn hình
+        if self.rect.x <= 0 or self.rect.x >= screen_width - self.rect.width:
+            self.speed_x = -self.speed_x  # Đảo chiều ngang
+
+    def draw(self, screen):
+        screen.blit(self.image, self.rect)
+
+    def off_screen(self, screen_height):
+        return self.rect.y > screen_height
+    
+    
 class Game:
     def __init__(self):
         self.high_score_manager = HighScoreManager("high_score.txt")
         self.background_image = pygame.image.load(
             "Images/background.png"
-        ).convert()  # Load your background image
-        self.item_drop_interval = config["item_drop_interval"]  # Set item drop interval
+        ).convert()  # Tải hình nền
+        self.item_drop_interval = config["item_drop_interval"]  # Đặt khoảng thời gian thả vật phẩm
         self.last_item_drop_time = pygame.time.get_ticks()
-        self.items = []  # Initialize list for items
+        self.items = []  # Khởi tạo danh sách vật phẩm
+        self.meteors = []  # Danh sách thiên thạch
+        self.meteor_spawn_interval = 3  # Khoảng thời gian tạo thiên thạch (giây)
+        self.last_meteor_spawn_time = time.time()
 
     def draw_text(self, text, x, y, screen, color=white):
         font = pygame.font.SysFont("Arial", 35)
@@ -24,70 +51,40 @@ class Game:
         screen.blit(screen_text, [x, y])
 
     def apply_item_effect(self, player, item, enemies):
-        """Apply the effect of the item to the player"""
+        """Áp dụng hiệu ứng của vật phẩm cho người chơi"""
         if item.effect == "regen":
             player.health = min(player.health + regen_amount, max_health)
         elif item.effect == "shield":
             player.shield = min(player.shield + shield_amount, max_shield)
         elif item.effect == "destroy_enemies":
-            enemies.clear()  # Clear all enemies if item effect is destroy_enemies
+            enemies.clear()  # Xóa tất cả kẻ thù nếu hiệu ứng của vật phẩm là phá hủy kẻ thù
 
-    def start_menu(self, screen):
-        menu_running = True
-        while menu_running:
-            screen.blit(self.background_image, (0, 0))  # Draw background
-            pygame.draw.rect(
-                screen, (255, 255, 255), (150, 100, 500, 400), border_radius=10
-            )  # Menu background
+    def spawn_meteor(self):
+        """Sinh thiên thạch sau khoảng thời gian định sẵn"""
+        if time.time() - self.last_meteor_spawn_time > self.meteor_spawn_interval:
+            self.meteors.append(Meteor(screen_width, screen_height))
+            self.last_meteor_spawn_time = time.time()
 
-            self.draw_text("Space Shooter", screen_width // 2 - 100, 130, screen)
+    def update_meteors(self, screen):
+        """Cập nhật vị trí và trạng thái của thiên thạch"""
+        for meteor in self.meteors:
+            meteor.move()
+            meteor.draw(screen)
 
-            buttons = [
-                ("Play", (200, 200)),
-                ("High Score", (200, 250)),
-                ("Reset High Score", (200, 300)),
-                ("Exit", (200, 350)),
-            ]
+        # Xóa thiên thạch ra khỏi màn hình
+        self.meteors = [meteor for meteor in self.meteors if not meteor.off_screen(screen_height)]
 
-            for text, (x, y) in buttons:
-                button_rect = pygame.Rect(x, y, 400, 40)
-                pygame.draw.rect(
-                    screen, (0, 120, 215), button_rect, border_radius=5
-                )  # Button background
-                self.draw_text(text, x + 150, y + 5, screen, white)
+    def check_meteor_collisions(self, player, enemies):
+        """Kiểm tra va chạm của thiên thạch"""
+        for meteor in self.meteors:
+            # Va chạm giữa thiên thạch và người chơi
+            if player.rect.colliderect(meteor.rect):
+                player.health -= 20  # Trừ máu người chơi
 
-            pygame.display.flip()
-
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    quit()
-
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_1:
-                        return "play"
-                    if event.key == pygame.K_2:
-                        return "high_score"
-                    if event.key == pygame.K_3:
-                        self.high_score_manager.reset_high_score()
-                    if event.key == pygame.K_4:
-                        pygame.quit()
-                        quit()
-
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    mouse_pos = event.pos
-                    for i, (_, (x, y)) in enumerate(buttons):
-                        button_rect = pygame.Rect(x, y, 400, 40)
-                        if button_rect.collidepoint(mouse_pos):
-                            if i == 0:  # Play
-                                return "play"
-                            elif i == 1:  # High Score
-                                return "high_score"
-                            elif i == 2:  # Reset High Score
-                                self.high_score_manager.reset_high_score()
-                            elif i == 3:  # Exit
-                                pygame.quit()
-                                quit()
+            # Va chạm giữa thiên thạch và kẻ địch
+            for enemy in enemies[:]:
+                if meteor.rect.colliderect(enemy.rect):
+                    enemies.remove(enemy)  # Loại bỏ kẻ địch
 
     def game_loop(self, screen):
         player = Player(screen_width, screen_height)
@@ -98,7 +95,7 @@ class Game:
         clock = pygame.time.Clock()
 
         while running:
-            screen.blit(self.background_image, (0, 0))  # Draw background
+            screen.blit(self.background_image, (0, 0))  # Vẽ hình nền
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -116,7 +113,7 @@ class Game:
 
             player.update_bullets()
 
-            # Spawn enemies at intervals
+            # Sinh kẻ thù định kỳ
             if random.randint(0, 50) == 0:
                 enemies.append(
                     Enemy(
@@ -124,18 +121,18 @@ class Game:
                     )
                 )
 
-            # Spawn enemies in formations
+            # Sinh kẻ thù theo đội hình
             if random.randint(0, 300) == 0:
                 enemies = enemies + new_formation()
 
-            # Drop items at regular intervals
+            # Thả vật phẩm định kỳ
             current_time = pygame.time.get_ticks()
             if current_time - self.last_item_drop_time > self.item_drop_interval:
                 new_item = DropItem(screen_width, screen_height)
                 self.items.append(new_item)
                 self.last_item_drop_time = current_time
 
-            # Move and display enemies
+            # Di chuyển và hiển thị kẻ thù
             for enemy in enemies:
                 enemy.move()
                 enemy.draw(screen)
@@ -143,7 +140,7 @@ class Game:
                     enemy.shoot()
                 enemy.update_bullets()
 
-            # Check for bullet-enemy collision
+            # Kiểm tra va chạm giữa đạn và kẻ thù
             for bullet in player.bullets:
                 for enemy in enemies:
                     if bullet.colliderect(enemy.rect):
@@ -152,20 +149,8 @@ class Game:
                         score += 1
                         break
 
-            # Check for bullet-enemy bullet collision
-            for enemy in enemies:
-                for bullet in enemy.bullets:
-                    if bullet.colliderect(
-                        pygame.Rect(
-                            player.x, player.y, spaceship_width, spaceship_height
-                        )
-                    ):
-                        enemy.bullets.remove(bullet)
-                        if player.lose_health():
-                            running = False
-
-            # Check for player-enemy collision
-            for enemy in enemies:
+            # Kiểm tra va chạm giữa người chơi và kẻ thù
+            for enemy in enemies[:]:
                 if enemy.rect.colliderect(
                     pygame.Rect(player.x, player.y, spaceship_width, spaceship_height)
                 ):
@@ -173,16 +158,22 @@ class Game:
                     if player.lose_health():
                         running = False
 
-            # Check for player-item collision
+            # Kiểm tra va chạm giữa người chơi và vật phẩm
             for item in self.items[:]:
                 if player.rect.colliderect(item.rect):
                     self.apply_item_effect(player, item, enemies)
                     self.items.remove(item)
 
-            # Remove enemies that are off-screen
+            # Cập nhật và xử lý thiên thạch
+            self.spawn_meteor()
+            self.update_meteors(screen)
+            self.check_meteor_collisions(player, enemies)
+            pygame.display.flip()
+
+            # Loại bỏ kẻ thù ra khỏi màn hình
             enemies = [enemy for enemy in enemies if enemy.rect.y < screen_height]
 
-            # Draw player, items, and score
+            # Vẽ người chơi, vật phẩm và điểm số
             player.draw(screen)
             for item in self.items:
                 item.move()
@@ -198,7 +189,7 @@ class Game:
         return score
 
     def display_score(self, screen, score):
-        """Display the score after game over"""
+        """Hiển thị điểm sau khi kết thúc trò chơi"""
         screen.fill(black)
         self.draw_text(f"Game Over", screen.get_width() // 2 - 100, 100, screen)
         self.draw_text(f"Score: {score}", screen.get_width() // 2 - 100, 200, screen)
@@ -207,7 +198,7 @@ class Game:
         )
         pygame.display.flip()
 
-        # Wait for user input to return to the main menu
+        # Chờ người chơi nhấn phím để quay lại menu chính
         waiting_for_input = True
         while waiting_for_input:
             for event in pygame.event.get():
@@ -216,9 +207,9 @@ class Game:
                     quit()
                 elif event.type == pygame.KEYUP:
                     if event.key == pygame.K_m:
-                        waiting_for_input = False  # Exit loop and return to main menu
+                        waiting_for_input = False  # Thoát vòng lặp và quay lại menu chính
                     elif event.key == pygame.K_q:
-                        pygame.quit()  # Quit the game if 'Q' is pressed
+                        pygame.quit()  # Thoát trò chơi nếu nhấn 'Q'
                         quit()
 
     def run(self, screen):
