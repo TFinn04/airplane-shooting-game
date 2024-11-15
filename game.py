@@ -86,8 +86,8 @@ class Game:
                 if meteor.rect.colliderect(enemy.rect):
                     enemies.remove(enemy)  # Loại bỏ kẻ địch
 
-    def game_loop(self, screen):
-        player = Player(screen_width, screen_height)
+    def game_loop(self, screen, spaceship_data):
+        player = Player(spaceship_data, screen_width, screen_height)
         enemies = []
         score = 0
         running = True

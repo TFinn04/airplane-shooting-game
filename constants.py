@@ -19,6 +19,10 @@ black = (0, 0, 0)  # Màu đen
 white = (255, 255, 255)  # Màu trắng
 red = (255, 0, 0)  # Màu đỏ
 green = (0, 255, 0)  # Màu xanh lá
+yellow = (255, 223, 0)
+light_blue = (173, 216, 230)
+dark_blue = (10, 10, 50)
+neon_blue = (0, 255, 255)
 
 # Thống kê của người chơi
 spaceship_width = config["spaceship_width"]  # Chiều rộng tàu không gian
