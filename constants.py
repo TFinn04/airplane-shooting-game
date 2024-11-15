@@ -52,3 +52,9 @@ item_drop_interval = config[
 shield_amount = config["shield_amount"]  # Số lượng khiên mà vật phẩm cung cấp
 max_shield = config["max_shield"]  # Số lượng khiên tối đa
 regen_amount = config["regen_amount"]  # Số lượng hồi phục khi vật phẩm hồi máu
+
+#thống kê boss
+boss_health = config["boss_health"]
+boss_width = config["boss_width"]
+boss_height = config["boss_height"]
+boss_speed = config["boss_speed"]
