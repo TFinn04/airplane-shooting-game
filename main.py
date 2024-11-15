@@ -9,43 +9,6 @@ def draw_text(text, x, y, screen, color=white, font_size=35):
     screen_text = font.render(text, True, color)
     screen.blit(screen_text, (x, y))
 
-def spaceship_selection_menu(screen, config):
-    spaceships = config["spaceships"]
-    selected_index = 0  # Chỉ số của máy bay được chọn
-
-    while True:
-        screen.fill(black)
-
-        # Hiển thị tiêu đề
-        draw_text("CHOOSE YOUR SPACESHIP", screen.get_width() // 2 - 200, 50, screen)
-
-        # Hiển thị thông tin từng máy bay
-        for i, spaceship in enumerate(spaceships):
-            color = green if i == selected_index else white
-            draw_text(
-                f"{spaceship['name']} (HP: {spaceship['hp']}, Damage: {spaceship['damage']}, Speed: {spaceship['speed']})",
-                100,
-                150 + i * 100,
-                screen,
-                color,
-            )
-            spaceship_image = pygame.image.load(spaceship["image"]).convert_alpha()
-            screen.blit(spaceship_image, (600, 150 + i * 100))
-
-        draw_text("Press ENTER to select", 100, 500, screen)
-
-        pygame.display.flip()
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                return None
-            elif event.type == pygame.KEYUP:
-                if event.key == pygame.K_UP:
-                    selected_index = (selected_index - 1) % len(spaceships)
-                elif event.key == pygame.K_DOWN:
-                    selected_index = (selected_index + 1) % len(spaceships)
-                elif event.key == pygame.K_RETURN:
-                    return spaceships[selected_index]
 
 def main_menu(screen, high_score_manager):
     # Load the menu background image
@@ -113,10 +76,7 @@ if __name__ == "__main__":
         action = main_menu(screen, high_score_manager)
 
         if action == "play":
-            spaceship_data = spaceship_selection_menu(screen, config)
-            if spaceship_data is None:
-                break  # Thoát nếu người dùng đóng game
-            result = game.game_loop(screen, spaceship_data)  # Truyền thông tin máy bay vào game loop
+            result = game.game_loop(screen)
             if result == "exit":
                 break
         elif action == "show_high_score":

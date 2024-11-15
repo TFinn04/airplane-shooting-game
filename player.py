@@ -3,24 +3,21 @@ from constants import *
 
 
 class Player:
-    def __init__(self, spaceship_data, screen_width, screen_height):
-        # Đặt các thuộc tính từ dữ liệu máy bay
+    def __init__(self, screen_width, screen_height):
+        # Đặt vị trí bắt đầu của người chơi
         self.x = screen_width // 2
         self.y = screen_height - spaceship_height - 10
-        self.speed = spaceship_data["speed"]
-        self.health = spaceship_data["hp"]
-        self.max_health = spaceship_data["hp"]
-        self.damage = spaceship_data["damage"]
+        self.speed = spaceship_speed
+        self.bullets = []
+        self.health = max_health
         self.lives = lives
         self.shield = 0  # Ban đầu không có lá chắn
         self.can_shoot = True
 
         # Tải hình ảnh của người chơi
-        self.image = pygame.image.load(spaceship_data["image"]).convert_alpha()
+        self.image = pygame.image.load("Images/player.png").convert_alpha()
         self.width = self.image.get_width()
         self.height = self.image.get_height()
-        
-        self.bullets = []
 
         # Khởi tạo thuộc tính rect để kiểm tra va chạm
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
