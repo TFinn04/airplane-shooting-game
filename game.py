@@ -116,6 +116,7 @@ class Game:
                 self.boss_active = True
                 self.last_boss = score  # Update last boss score
                 self.boss_spawntime = time.time()
+                boss_action_time = time.time()
 
             # Spawn things if boss not active
             if not self.boss_active:
@@ -145,13 +146,31 @@ class Game:
             
             # Delay for boss spawn and death
             if self.boss_active:
-                if time.time() - self.boss_spawntime >= 4 and self.boss_spawntime!=0:
+                if time.time() - self.boss_spawntime <= 5 and time.time() - self.boss_spawntime >= 2 and self.boss_spawntime != 0:
+                    elapsed_time = time.time() - self.boss_spawntime
+                    frame_index = int(elapsed_time * 20) % 20 
+
+                    # Load the corresponding image
+                    warning_image_path = f"Images/warning/warning{frame_index + 1}.png"
+                    warning_image = pygame.image.load(warning_image_path).convert_alpha()
+
+                    # Center the image on the screen
+                    warning_rect = warning_image.get_rect(center=(screen_width // 2, screen_height // 2))
+                    screen.blit(warning_image, warning_rect)
+
+                if time.time() - self.boss_spawntime >= 6 and self.boss_spawntime!=0:
                     self.boss.move()  # Move boss downward to the target position
                     self.boss.draw(screen)  # Draw the boss
                 
                 elif time.time() - self.boss_deathtime >= 4 and self.boss_deathtime!=0:
                     self.boss_deathtime =0
                     self.boss_active = False
+
+            # Boss actions
+            if self.boss_active:
+                if (time.time()- self.boss_spawntime) >=10 and self.boss_deathtime==0:
+                    self.boss.attack1()
+                    self.boss.update_bullets()
 
             # Move and display enemies
             for enemy in enemies:
@@ -196,6 +215,18 @@ class Game:
                         )
                     ):
                         enemy.bullets.remove(bullet)
+                        if player.lose_health():
+                            running = False
+
+            # Check for player-boss bullet collision
+            if self.boss:
+                for bullet in self.boss.bullets:
+                    if bullet.colliderect(
+                        pygame.Rect(
+                            player.x, player.y, spaceship_width, spaceship_height
+                        )
+                    ):
+                        self.boss.bullets.remove(bullet)
                         if player.lose_health():
                             running = False
 
