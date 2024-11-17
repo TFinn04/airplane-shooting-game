@@ -21,10 +21,13 @@
   "regen_amount": 50,
   "shield_amount": 50,
   "max_shield": 100,
-  "boss_health": 1000,
+  "boss_health": 2000,
   "boss_width": 370,
   "boss_height": 250,
   "boss_speed": 1,
+  "beam_width": 100,
+  "beam_height": 620,
+  "charge_size": 100,
   "spaceships": [
     {
       "name": "Falcon",

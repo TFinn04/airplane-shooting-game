@@ -46,6 +46,8 @@ class Game:
         self.boss = None
         self.boss_spawntime = 0
         self.boss_deathtime = 0
+        self.boss_act = False
+        self.boss_action = 0
 
     def draw_text(self, text, x, y, screen, color=white):
         font = pygame.font.SysFont("Arial", 35)
@@ -116,7 +118,7 @@ class Game:
                 self.boss_active = True
                 self.last_boss = score  # Update last boss score
                 self.boss_spawntime = time.time()
-                boss_action_time = time.time()
+                self.boss_action =time.time()
 
             # Spawn things if boss not active
             if not self.boss_active:
@@ -167,10 +169,37 @@ class Game:
                     self.boss_active = False
 
             # Boss actions
-            if self.boss_active:
-                if (time.time()- self.boss_spawntime) >=10 and self.boss_deathtime==0:
+            if self.boss:
+                if not self.boss_act and time.time() - self.boss_action >= 10:
+                    self.boss_action = random.choice([time.time() - 10,time.time() -27])
+                    self.boss_act = True
+                if (time.time()- self.boss_action) >=10 and (time.time()- self.boss_action) <=22:
                     self.boss.attack1()
-                    self.boss.update_bullets()
+                if (time.time()- self.boss_action) <25 and (time.time()- self.boss_action) >22:
+                    self.boss.reposition()
+                self.boss.update_bullets()
+                if (time.time()- self.boss_action) >=25 and (time.time()- self.boss_action) <=26:
+                    self.boss_act=False
+                    self.boss_action = time.time()-8
+                if(time.time() - self.boss_action) >26 and (time.time()- self.boss_action) < 35:
+                    self.boss.attack2()
+                if(time.time() - self.boss_action) >=36 and (time.time()- self.boss_action) <= 37:
+                    self.boss_act=False
+                    self.boss_action = time.time()-7
+                self.boss.update_attack2()
+                if self.boss.beam_active:
+                # Check for beam collision with player
+                    beam_rect = pygame.Rect(
+                        self.boss.rect.centerx - beam_width // 2,
+                        self.boss.rect.bottom,
+                        beam_width,
+                        beam_height
+                    )
+                    if beam_rect.colliderect(pygame.Rect(player.x, player.y, spaceship_width, spaceship_height)):
+                        if player.lose_health():
+                            running = False
+                            self.boss_active=False
+                            self.boss = None
 
             # Move and display enemies
             for enemy in enemies:
@@ -205,6 +234,8 @@ class Game:
             ):
                 if player.lose_health:
                     running=False
+                    self.boss_active=False
+                    self.boss = None
 
             # Check for player-enemy bullet collision
             for enemy in enemies:
@@ -217,6 +248,9 @@ class Game:
                         enemy.bullets.remove(bullet)
                         if player.lose_health():
                             running = False
+                            if self.boss_active:
+                                self.boss_active=False
+                                self.boss = None
 
             # Check for player-boss bullet collision
             if self.boss:
@@ -229,6 +263,8 @@ class Game:
                         self.boss.bullets.remove(bullet)
                         if player.lose_health():
                             running = False
+                            self.boss_active=False
+                            self.boss = None
 
             # Check for player-enemy collision
             for enemy in enemies:
@@ -238,6 +274,9 @@ class Game:
                     enemies.remove(enemy)
                     if player.lose_health():
                         running = False
+                        if self.boss_active:
+                            self.boss_active=False
+                            self.boss = None
 
             # Check for player-item collision
             for item in self.items[:]:

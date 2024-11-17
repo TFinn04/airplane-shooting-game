@@ -58,3 +58,7 @@ boss_health = config["boss_health"]
 boss_width = config["boss_width"]
 boss_height = config["boss_height"]
 boss_speed = config["boss_speed"]
+# Thống kê của tia năng lượng
+beam_width = config["beam_width"]
+beam_height = config["beam_height"]
+charge_size = config["charge_size"]
