@@ -123,7 +123,7 @@ class Game:
             # Spawn things if boss not active
             if not self.boss_active:
                 # Spawn enemies at intervals
-                if random.randint(0, 50) == 0:
+                if random.randint(0, max(abs(100-score),50)) == 0:
                     enemies.append(
                         Enemy(
                             random.randint(0, screen_width - enemy_width), -enemy_height, 0
@@ -131,8 +131,8 @@ class Game:
                     )
             
                 # Spawn enemies in formations
-                if random.randint(0, 300) == 0:
-                    enemies = enemies + new_formation()
+                if random.randint(0, max(abs(500-score),500)) == 0:
+                    enemies = enemies + new_formation(score)
 
                 # Drop items at regular intervals
                 current_time = pygame.time.get_ticks()
@@ -205,7 +205,7 @@ class Game:
             for enemy in enemies:
                 enemy.move()
                 enemy.draw(screen)
-                if random.randint(0, 400) == 0:
+                if random.randint(0, max(abs(250-score),150)) == 0:
                     enemy.shoot()
                 enemy.update_bullets()
 
