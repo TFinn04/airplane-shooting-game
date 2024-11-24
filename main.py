@@ -10,7 +10,7 @@ pygame.mixer.init()
 # Tải và phát nhạc nền
 pygame.mixer.music.load('Sounds/sci_fi_adventure.mp3')  # Đường dẫn tới tệp nhạc của bạn
 pygame.mixer.music.play(-1)  # Phát lặp vô hạn
-pygame.mixer.music.set_volume(0.05)  # Điều chỉnh âm lượng (0.0 - 1.0)
+pygame.mixer.music.set_volume(0.03)  # Điều chỉnh âm lượng (0.0 - 1.0)
 def draw_text(text, x, y, screen, color=white, font_size=35):
     font = pygame.font.SysFont("Arial", font_size)
     screen_text = font.render(text, True, color)

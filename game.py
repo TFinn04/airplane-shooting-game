@@ -304,18 +304,86 @@ class Game:
         return score
 
     def display_score(self, screen, score):
-        """Display the score after game over"""
-        screen.fill(black)
-        self.draw_text(f"Game Over", screen.get_width() // 2 - 100, 100, screen)
-        self.draw_text(f"Score: {score}", screen.get_width() // 2 - 100, 200, screen)
-        self.draw_text(
-            "Press M to return to Main Menu", screen.get_width() // 2 - 200, 300, screen
+        """Display the score after game over with enhanced visuals and effects."""
+        # Load and scale the background image
+        background_image = pygame.image.load("Images/game_over_background.png")
+        background_image = pygame.transform.scale(
+            background_image, (screen.get_width(), screen.get_height())
         )
-        pygame.display.flip()
 
-        # Wait for user input to return to the main menu
+        # Load custom font (use a TTF file for sci-fi style fonts)
+        try:
+            font_path = "Fonts/orbitron.ttf"  # Replace with your sci-fi font path
+            title_font = pygame.font.Font(font_path, 80)
+            text_font = pygame.font.Font(font_path, 40)
+        except FileNotFoundError:
+            # Fallback to default font if custom font is not found
+            title_font = pygame.font.SysFont("Arial", 70, bold=True)
+            text_font = pygame.font.SysFont("Arial", 20, bold=True)
+            text1_font = pygame.font.SysFont("Arial", 30, bold=True)
+
+        # Initialize variables for animation
+        alpha = 0  # Fade effect for "Game Over"
+        blink_timer = pygame.time.get_ticks()
+        blink_interval = 500
+        blink = True
+        zoom_factor = 1.0
+        zoom_direction = 1
+
+        # Loop for the Game Over screen
         waiting_for_input = True
         while waiting_for_input:
+            # Draw the background image
+            screen.blit(background_image, (0, 0))
+
+            # Apply zoom effect to "Game Over"
+            if zoom_direction == 1:
+                zoom_factor += 0.002
+                if zoom_factor >= 1.2:
+                    zoom_direction = -1
+            else:
+                zoom_factor -= 0.002
+                if zoom_factor <= 1.0:
+                    zoom_direction = 1
+
+            # Render "Game Over" with fade and zoom effects
+            title_surface = title_font.render("Game Over", True, (176, 196, 222))
+            title_surface = pygame.transform.scale(
+                title_surface,
+                (
+                    int(title_surface.get_width() * zoom_factor),
+                    int(title_surface.get_height() * zoom_factor),
+                ),
+            )
+            title_rect = title_surface.get_rect(center=(screen.get_width() // 2, 150))
+            screen.blit(title_surface, title_rect)
+
+            # Render score and instructions
+            score_surface = text1_font.render(f"Score: {score}", True, (50, 50, 50))
+            score_rect = score_surface.get_rect(center=(screen.get_width() // 2, 250))
+            screen.blit(score_surface, score_rect)
+
+            if blink:
+                menu_surface = text_font.render(
+                    "Press M to return to Main Menu", True, (22,11,33)
+                )
+                menu_rect = menu_surface.get_rect(center=(screen.get_width() // 2, 350))
+                screen.blit(menu_surface, menu_rect)
+
+                quit_surface = text_font.render("Press Q to Quit", True, (22,11,33))
+                quit_rect = quit_surface.get_rect(center=(screen.get_width() // 2, 400))
+                screen.blit(quit_surface, quit_rect)
+
+            # Handle blinking effect
+            current_time = pygame.time.get_ticks()
+            if current_time - blink_timer > blink_interval:
+                blink = not blink
+                blink_timer = current_time
+
+            # Update the display
+            pygame.display.flip()
+
+            # Handle user input
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -326,6 +394,7 @@ class Game:
                     elif event.key == pygame.K_q:
                         pygame.quit()  # Quit the game if 'Q' is pressed
                         quit()
+
 
     def run(self, screen):
         while True:
