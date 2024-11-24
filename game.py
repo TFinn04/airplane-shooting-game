@@ -8,26 +8,8 @@ from enemy_formation import *
 from drop_item import DropItem  # Import DropItem
 from boss import Boss
 import time
+from meteor import Meteor
 
-class Meteor:
-    def __init__(self, screen_width, screen_height):
-        self.image = pygame.image.load("Images/meteor.png").convert_alpha()
-        self.rect = self.image.get_rect()
-        self.rect.x = random.randint(0, max(0, screen_width - self.rect.width))
-        self.rect.y = -self.rect.height
-        self.speed_y = random.randint(5, 10)  # Tốc độ rơi dọc (Y)
-        self.speed_x = random.choice([-1, 1]) * random.randint(3, 7)  # Tốc độ ngang (X)
-    def move(self):
-        self.rect.y += self.speed_y  # Di chuyển theo trục Y
-        self.rect.x += self.speed_x  # Di chuyển theo trục X
-        # Đảo chiều nếu thiên thạch chạm rìa màn hình
-        if self.rect.x <= 0 or self.rect.x >= screen_width - self.rect.width:
-            self.speed_x = -self.speed_x  # Đảo chiều ngang
-    def draw(self, screen):
-        screen.blit(self.image, self.rect)
-    def off_screen(self, screen_height):
-        return self.rect.y > screen_height
-    
 
 class Game:
     def __init__(self):
@@ -39,7 +21,7 @@ class Game:
         self.last_item_drop_time = pygame.time.get_ticks()
         self.items = []  # Khởi tạo danh sách vật phẩm
         self.meteors = []  # Danh sách thiên thạch
-        self.meteor_spawn_interval = 3  # Khoảng thời gian tạo thiên thạch (giây)
+        self.meteor_spawn_interval = 3.5  # Khoảng thời gian tạo thiên thạch (giây)
         self.last_meteor_spawn_time = time.time()
         self.boss_active = False  # Flag to track if boss spawn is active
         self.last_boss = 0  # Track last score milestone for boss appearance
@@ -79,7 +61,17 @@ class Game:
         for meteor in self.meteors:
             # Va chạm giữa thiên thạch và người chơi
             if player.rect.colliderect(meteor.rect):
-                player.health -= 20  # Trừ máu người chơi
+                player.health -= 5  # Trừ máu người chơi
+                
+                # Nếu máu người chơi <= 0, trừ mạng và reset máu
+                if player.health <= 0:
+                    player.lives -= 1  # Trừ một mạng
+                    player.health = 100  # Reset máu về 100 (hoặc giá trị tối đa của bạn)
+                    
+                    # Kiểm tra nếu người chơi hết mạng
+                    if player.lives <= 0:
+                        return True
+
             # Va chạm giữa thiên thạch và kẻ địch
             for enemy in enemies[:]:
                 if meteor.rect.colliderect(enemy.rect):
@@ -145,7 +137,12 @@ class Game:
                 self.spawn_meteor()
                 self.update_meteors(screen)
                 self.check_meteor_collisions(player, enemies)
-            
+                if self.check_meteor_collisions(player, enemies):
+                    self.display_score(screen, score)  # Hiển thị màn hình Game Over
+                    running = False
+                    continue  # Thoát khỏi vòng lặp game
+
+                    
             # Delay for boss spawn and death
             if self.boss_active:
                 if time.time() - self.boss_spawntime <= 5 and time.time() - self.boss_spawntime >= 2 and self.boss_spawntime != 0:
