@@ -111,51 +111,124 @@ def main_menu(screen, high_score_manager):
         menu_background, (screen_width, screen_height)
     )
 
+    # Load custom font for a more modern style
+    try:
+        font_path = "Fonts/orbitron.ttf"
+        title_font = pygame.font.Font(font_path, 80)
+        option_font = pygame.font.Font(font_path, 40)
+    except FileNotFoundError:
+        title_font = pygame.font.SysFont("Arial", 70, bold=True)
+        option_font = pygame.font.SysFont("Arial", 30, bold=True)
+
+    selected_option = 0  # Track the currently selected menu option
+    menu_options = ["Play", "Show High Score", "Reset High Score", "Exit"]
+
     while True:
         screen.blit(menu_background, (0, 0))  # Draw the background image
 
-        # Draw menu text on top of the background
-        draw_text("MAIN MENU", screen.get_width() // 2 - 100, 100, screen)
-        draw_text("1. Play", screen.get_width() // 2 - 100, 200, screen)
-        draw_text("2. Show High Score", screen.get_width() // 2 - 100, 300, screen)
-        draw_text("3. Reset High Score", screen.get_width() // 2 - 100, 400, screen)
-        draw_text("4. Exit", screen.get_width() // 2 - 100, 500, screen)
+        # Draw title
+        title_surface = title_font.render("SPACE SHOOTER", True, (255, 223, 0))
+        title_rect = title_surface.get_rect(center=(screen_width // 2, 100))
+        screen.blit(title_surface, title_rect)
+
+        # Draw menu options
+        for i, option in enumerate(menu_options):
+            color = (255, 223, 0) if i == selected_option else (200, 200, 200)
+            option_surface = option_font.render(option, True, color)
+            option_rect = option_surface.get_rect(center=(screen_width // 2, 200 + i * 80))
+            screen.blit(option_surface, option_rect)
+
         pygame.display.flip()
 
+        # Handle input for menu navigation
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return "exit"
             elif event.type == pygame.KEYUP:
-                if event.key == pygame.K_1:
-                    return "play"
-                elif event.key == pygame.K_2:
-                    return "show_high_score"
-                elif event.key == pygame.K_3:
-                    high_score_manager.reset_high_score()
-                elif event.key == pygame.K_4:
-                    return "exit"
+                if event.key == pygame.K_UP:
+                    selected_option = (selected_option - 1) % len(menu_options)
+                elif event.key == pygame.K_DOWN:
+                    selected_option = (selected_option + 1) % len(menu_options)
+                elif event.key == pygame.K_RETURN:
+                    if selected_option == 0:  # Play
+                        return "play"
+                    elif selected_option == 1:  # Show High Score
+                        return "show_high_score"
+                    elif selected_option == 2:  # Reset High Score
+                        high_score_manager.reset_high_score()
+                    elif selected_option == 3:  # Exit
+                        return "exit"
 
 
 def show_high_score(screen, high_score_manager):
-    screen.fill(black)
-    draw_text("HIGH SCORE", screen.get_width() // 2 - 100, 100, screen)
-    draw_text(
-        f"High Score: {high_score_manager.high_score}",
-        screen.get_width() // 2 - 100,
-        200,
-        screen,
-    )
-    draw_text(
-        "Press M to return to Main Menu", screen.get_width() // 2 - 200, 300, screen
-    )
-    pygame.display.flip()
+    # Load custom font
+    try:
+        font_path = "Fonts/orbitron.ttf"
+        title_font = pygame.font.Font(font_path, 80)
+        score_font = pygame.font.Font(font_path, 50)
+        instruction_font = pygame.font.Font(font_path, 30)
+    except FileNotFoundError:
+        title_font = pygame.font.SysFont("Arial", 70, bold=True)
+        score_font = pygame.font.SysFont("Arial", 40, bold=True)
+        instruction_font = pygame.font.SysFont("Arial", 30, bold=True)
+
+    glow_alpha = 0
+    glow_increasing = True
 
     while True:
+        # Fill the screen with a background color
+        screen.fill((0, 0, 50))
+
+        # Handle glow animation
+        if glow_increasing:
+            glow_alpha += 3
+            if glow_alpha > 150:
+                glow_increasing = False
+        else:
+            glow_alpha -= 3
+            if glow_alpha < 0:
+                glow_increasing = True
+
+        # Create a transparent surface for the glowing rectangle
+        glow_surface = pygame.Surface((screen.get_width(), screen.get_height()), pygame.SRCALPHA)
+        glow_color = (255, 223, 0, glow_alpha)  # RGBA with alpha
+        
+        # Create rectangle
+        title_rect = pygame.Rect(screen.get_width() // 2 - 200, 100, 400, 80)  # Rect for title
+        pygame.draw.rect(glow_surface, glow_color[:3], title_rect.inflate(50, 30), border_radius=20)
+
+        # Blit the glow surface onto the main screen
+        screen.blit(glow_surface, (0, 0))
+
+        # Draw the title
+        title_surface = title_font.render("HIGH SCORE", True, (255, 255, 255))
+        title_rect = title_surface.get_rect(center=(screen.get_width() // 2, 140))
+        screen.blit(title_surface, title_rect)
+
+        # Display the high score
+        score_surface = score_font.render(
+            f"High Score: {high_score_manager.high_score}", True, (255, 255, 255)
+        )
+        score_rect = score_surface.get_rect(center=(screen.get_width() // 2, 250))
+        screen.blit(score_surface, score_rect)
+
+        # Display instructions
+        instruction_surface = instruction_font.render(
+            "Press M to return to Main Menu", True, (200, 200, 200)
+        )
+        instruction_rect = instruction_surface.get_rect(center=(screen.get_width() // 2, 350))
+        screen.blit(instruction_surface, instruction_rect)
+
+        # Update the screen
+        pygame.display.flip()
+
+        # Handle events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return "exit"
             elif event.type == pygame.KEYUP and event.key == pygame.K_m:
                 return "main_menu"
+
 
 
 if __name__ == "__main__":

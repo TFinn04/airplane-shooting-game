@@ -42,10 +42,6 @@ class Meteor:
         self.rect.y += self.speed_y  # Di chuyển theo trục Y
         self.rect.x += self.speed_x  # Di chuyển theo trục X
 
-        # Đảo chiều nếu thiên thạch chạm rìa màn hình
-        if self.rect.x <= 0 or self.rect.x >= self.screen_width - self.rect.width:
-            self.speed_x = -self.speed_x  # Đảo chiều ngang
-
     def draw(self, screen):
         screen.blit(self.image, self.rect)
 
