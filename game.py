@@ -105,7 +105,7 @@ class Game:
             player.update_bullets()
 
             #spawn boss when reach required score
-            if score % 50 == 0 and score > 0 and score != self.last_boss and not self.boss_active:
+            if score % 2 == 0 and score > 0 and score != self.last_boss and not self.boss_active:
                 self.boss = Boss()
                 self.boss_active = True
                 self.last_boss = score  # Update last boss score
