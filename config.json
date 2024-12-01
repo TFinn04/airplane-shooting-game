@@ -29,26 +29,29 @@
   "beam_height": 620,
   "charge_size": 100,
   "spaceships": [
-    {
-      "name": "Falcon",
-      "image_folder": "Images/Spaceship/Falcon/",
-      "hp": 100,
-      "damage": 10,
-      "speed": 5
-    },
-    {
-      "name": "Eagle",
-      "image_folder": "Images/Spaceship/Eagle/",
-      "hp": 120,
-      "damage": 8,
-      "speed": 4
-    },
-    {
-      "name": "Hawk",
-      "image_folder": "Images/Spaceship/Hawk/",
-      "hp": 80,
-      "damage": 12,
-      "speed": 6
-    }
+      {
+        "name": "Falcon",
+        "image_folder": "Images/Spaceship/Falcon/",
+        "bullet_folder": "Images/Spaceship_Bullets/Falcon/",
+        "hp": 100,
+        "damage": 10,
+        "speed": 5
+      },
+      {
+        "name": "Eagle",
+        "image_folder": "Images/Spaceship/Eagle/",
+        "bullet_folder": "Images/Spaceship_Bullets/Eagle/",
+        "hp": 120,
+        "damage": 8,
+        "speed": 4
+      },
+      {
+        "name": "Hawk",
+        "image_folder": "Images/Spaceship/Hawk/",
+        "bullet_folder": "Images/Spaceship_Bullets/Hawk/",
+        "hp": 80,
+        "damage": 12,
+        "speed": 6
+      }
   ]
 }
