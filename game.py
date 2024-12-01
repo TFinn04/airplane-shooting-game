@@ -8,26 +8,8 @@ from enemy_formation import *
 from drop_item import DropItem  # Import DropItem
 from boss import Boss
 import time
+from meteor import Meteor
 
-class Meteor:
-    def __init__(self, screen_width, screen_height):
-        self.image = pygame.image.load("Images/meteor.png").convert_alpha()
-        self.rect = self.image.get_rect()
-        self.rect.x = random.randint(0, max(0, screen_width - self.rect.width))
-        self.rect.y = -self.rect.height
-        self.speed_y = random.randint(5, 10)  # Tốc độ rơi dọc (Y)
-        self.speed_x = random.choice([-1, 1]) * random.randint(3, 7)  # Tốc độ ngang (X)
-    def move(self):
-        self.rect.y += self.speed_y  # Di chuyển theo trục Y
-        self.rect.x += self.speed_x  # Di chuyển theo trục X
-        # Đảo chiều nếu thiên thạch chạm rìa màn hình
-        if self.rect.x <= 0 or self.rect.x >= screen_width - self.rect.width:
-            self.speed_x = -self.speed_x  # Đảo chiều ngang
-    def draw(self, screen):
-        screen.blit(self.image, self.rect)
-    def off_screen(self, screen_height):
-        return self.rect.y > screen_height
-    
 
 class Game:
     def __init__(self):
@@ -39,7 +21,7 @@ class Game:
         self.last_item_drop_time = pygame.time.get_ticks()
         self.items = []  # Khởi tạo danh sách vật phẩm
         self.meteors = []  # Danh sách thiên thạch
-        self.meteor_spawn_interval = 3  # Khoảng thời gian tạo thiên thạch (giây)
+        self.meteor_spawn_interval = 3.5  # Khoảng thời gian tạo thiên thạch (giây)
         self.last_meteor_spawn_time = time.time()
         self.boss_active = False  # Flag to track if boss spawn is active
         self.last_boss = 0  # Track last score milestone for boss appearance
@@ -79,7 +61,17 @@ class Game:
         for meteor in self.meteors:
             # Va chạm giữa thiên thạch và người chơi
             if player.rect.colliderect(meteor.rect):
-                player.health -= 20  # Trừ máu người chơi
+                player.health -= 5  # Trừ máu người chơi
+                
+                # Nếu máu người chơi <= 0, trừ mạng và reset máu
+                if player.health <= 0:
+                    player.lives -= 1  # Trừ một mạng
+                    player.health = 100  # Reset máu về 100 (hoặc giá trị tối đa của bạn)
+                    
+                    # Kiểm tra nếu người chơi hết mạng
+                    if player.lives <= 0:
+                        return True
+
             # Va chạm giữa thiên thạch và kẻ địch
             for enemy in enemies[:]:
                 if meteor.rect.colliderect(enemy.rect):
@@ -145,7 +137,12 @@ class Game:
                 self.spawn_meteor()
                 self.update_meteors(screen)
                 self.check_meteor_collisions(player, enemies)
-            
+                if self.check_meteor_collisions(player, enemies):
+                    self.display_score(screen, score)  # Hiển thị màn hình Game Over
+                    running = False
+                    continue  # Thoát khỏi vòng lặp game
+
+                    
             # Delay for boss spawn and death
             if self.boss_active:
                 if time.time() - self.boss_spawntime <= 5 and time.time() - self.boss_spawntime >= 2 and self.boss_spawntime != 0:
@@ -304,18 +301,86 @@ class Game:
         return score
 
     def display_score(self, screen, score):
-        """Display the score after game over"""
-        screen.fill(black)
-        self.draw_text(f"Game Over", screen.get_width() // 2 - 100, 100, screen)
-        self.draw_text(f"Score: {score}", screen.get_width() // 2 - 100, 200, screen)
-        self.draw_text(
-            "Press M to return to Main Menu", screen.get_width() // 2 - 200, 300, screen
+        """Display the score after game over with enhanced visuals and effects."""
+        # Load and scale the background image
+        background_image = pygame.image.load("Images/game_over_background.png")
+        background_image = pygame.transform.scale(
+            background_image, (screen.get_width(), screen.get_height())
         )
-        pygame.display.flip()
 
-        # Wait for user input to return to the main menu
+        # Load custom font (use a TTF file for sci-fi style fonts)
+        try:
+            font_path = "Fonts/orbitron.ttf"  # Replace with your sci-fi font path
+            title_font = pygame.font.Font(font_path, 80)
+            text_font = pygame.font.Font(font_path, 40)
+        except FileNotFoundError:
+            # Fallback to default font if custom font is not found
+            title_font = pygame.font.SysFont("Arial", 70, bold=True)
+            text_font = pygame.font.SysFont("Arial", 20, bold=True)
+            text1_font = pygame.font.SysFont("Arial", 30, bold=True)
+
+        # Initialize variables for animation
+        alpha = 0  # Fade effect for "Game Over"
+        blink_timer = pygame.time.get_ticks()
+        blink_interval = 500
+        blink = True
+        zoom_factor = 1.0
+        zoom_direction = 1
+
+        # Loop for the Game Over screen
         waiting_for_input = True
         while waiting_for_input:
+            # Draw the background image
+            screen.blit(background_image, (0, 0))
+
+            # Apply zoom effect to "Game Over"
+            if zoom_direction == 1:
+                zoom_factor += 0.002
+                if zoom_factor >= 1.2:
+                    zoom_direction = -1
+            else:
+                zoom_factor -= 0.002
+                if zoom_factor <= 1.0:
+                    zoom_direction = 1
+
+            # Render "Game Over" with fade and zoom effects
+            title_surface = title_font.render("Game Over", True, (176, 196, 222))
+            title_surface = pygame.transform.scale(
+                title_surface,
+                (
+                    int(title_surface.get_width() * zoom_factor),
+                    int(title_surface.get_height() * zoom_factor),
+                ),
+            )
+            title_rect = title_surface.get_rect(center=(screen.get_width() // 2, 150))
+            screen.blit(title_surface, title_rect)
+
+            # Render score and instructions
+            score_surface = text1_font.render(f"Score: {score}", True, (50, 50, 50))
+            score_rect = score_surface.get_rect(center=(screen.get_width() // 2, 250))
+            screen.blit(score_surface, score_rect)
+
+            if blink:
+                menu_surface = text_font.render(
+                    "Press M to return to Main Menu", True, (22,11,33)
+                )
+                menu_rect = menu_surface.get_rect(center=(screen.get_width() // 2, 350))
+                screen.blit(menu_surface, menu_rect)
+
+                quit_surface = text_font.render("Press Q to Quit", True, (22,11,33))
+                quit_rect = quit_surface.get_rect(center=(screen.get_width() // 2, 400))
+                screen.blit(quit_surface, quit_rect)
+
+            # Handle blinking effect
+            current_time = pygame.time.get_ticks()
+            if current_time - blink_timer > blink_interval:
+                blink = not blink
+                blink_timer = current_time
+
+            # Update the display
+            pygame.display.flip()
+
+            # Handle user input
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -326,6 +391,7 @@ class Game:
                     elif event.key == pygame.K_q:
                         pygame.quit()  # Quit the game if 'Q' is pressed
                         quit()
+
 
     def run(self, screen):
         while True:
