@@ -1,4 +1,5 @@
 import pygame
+import os
 from game import Game
 from high_score_manager import HighScoreManager
 from constants import *
@@ -72,7 +73,9 @@ def spaceship_selection_menu(screen, config):
             screen.blit(description_surface, description_rect)
 
             # Hiển thị hình ảnh tàu vũ trụ với hiệu ứng phóng to nếu được chọn
-            spaceship_image = pygame.image.load(spaceship["image"]).convert_alpha()
+            spaceship_image = pygame.image.load(
+                os.path.join(spaceship["image_folder"], "player1.png")
+            ).convert_alpha()
             if i == selected_index:
                 spaceship_image = pygame.transform.scale(spaceship_image, (120, 120))  # Điều chỉnh kích thước
                 screen.blit(spaceship_image, (620, 100 + i * 120 - 10))  # Điều chỉnh vị trí

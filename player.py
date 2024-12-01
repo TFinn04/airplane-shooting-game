@@ -1,4 +1,5 @@
 import pygame
+import os
 from constants import *
 
 
@@ -15,10 +16,19 @@ class Player:
         self.shield = 0  # Ban đầu không có lá chắn
         self.can_shoot = True
 
-        # Tải hình ảnh của người chơi
-        self.image = pygame.image.load(spaceship_data["image"]).convert_alpha()
-        self.width = self.image.get_width()
-        self.height = self.image.get_height()
+        # Load tất cả frame từ folder
+        self.frames = []
+        image_folder = spaceship_data["image_folder"]
+        for filename in sorted(os.listdir(image_folder)):  # Đảm bảo thứ tự frame
+            if filename.endswith(".png"):
+                frame = pygame.image.load(os.path.join(image_folder, filename)).convert_alpha()
+                self.frames.append(frame)
+        self.current_frame = 0  # Frame hiện tại
+        self.animation_speed = 5  # Tốc độ chuyển frame
+        self.frame_counter = 0
+        
+        self.width = self.frames[0].get_width()
+        self.height = self.frames[0].get_height()
         
         self.bullets = []
 
@@ -48,6 +58,13 @@ class Player:
         # Cập nhật vị trí rect sau khi di chuyển
         self.rect.topleft = (self.x, self.y)
 
+    def animate(self):
+        # Điều chỉnh khung hình mỗi khi bộ đếm đạt đến ngưỡng tốc độ
+        self.frame_counter += 1
+        if self.frame_counter >= self.animation_speed:
+            self.current_frame = (self.current_frame + 1) % len(self.frames)
+            self.frame_counter = 0
+
     def shoot(self):
         if self.can_shoot:
             bullet = pygame.Rect(
@@ -60,8 +77,9 @@ class Player:
             self.can_shoot = False  # Người chơi chỉ có thể bắn lại sau khi nhả nút
 
     def draw(self, screen):
-        # Vẽ hình ảnh của người chơi trên màn hình
-        screen.blit(self.image, (self.x, self.y))
+        # Gọi animate để chuyển frame
+        self.animate()
+        screen.blit(self.frames[self.current_frame], (self.x, self.y))
 
         # Vẽ các viên đạn
         for bullet in self.bullets:

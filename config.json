@@ -31,21 +31,21 @@
   "spaceships": [
     {
       "name": "Falcon",
-      "image": "Images/Falcon.png",
+      "image_folder": "Images/Spaceship/Falcon/",
       "hp": 100,
       "damage": 10,
       "speed": 5
     },
     {
       "name": "Eagle",
-      "image": "Images/Eagle.png",
+      "image_folder": "Images/Spaceship/Eagle/",
       "hp": 120,
       "damage": 8,
       "speed": 4
     },
     {
       "name": "Hawk",
-      "image": "Images/Hawk.png",
+      "image_folder": "Images/Spaceship/Hawk/",
       "hp": 80,
       "damage": 12,
       "speed": 6
