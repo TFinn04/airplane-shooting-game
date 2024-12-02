@@ -13,6 +13,16 @@ from meteor import Meteor
 
 class Game:
     def __init__(self):
+
+        pygame.mixer.init()
+        # Hiệu ứng âm thanh
+        self.shoot_sound = pygame.mixer.Sound("Sounds/shoot.wav")
+        self.enemy_hit_sound = pygame.mixer.Sound("Sounds/hit.wav")
+        self.item_pickup_sound = pygame.mixer.Sound("Sounds/item_pickup.wav")
+        self.shoot_sound.set_volume(0.25)
+        self.enemy_hit_sound.set_volume(0.25)
+        self.item_pickup_sound.set_volume(0.25)
+
         self.high_score_manager = HighScoreManager("high_score.txt")
         self.background_image = pygame.image.load(
             "Images/background.png"
@@ -44,30 +54,37 @@ class Game:
             player.shield = min(player.shield + shield_amount, max_shield)
         elif item.effect == "destroy_enemies":
             enemies.clear()  # Xóa tất cả kẻ thù nếu hiệu ứng của vật phẩm là phá hủy kẻ thù
+
     def spawn_meteor(self):
         """Sinh thiên thạch sau khoảng thời gian định sẵn"""
         if time.time() - self.last_meteor_spawn_time > self.meteor_spawn_interval:
             self.meteors.append(Meteor(screen_width, screen_height))
             self.last_meteor_spawn_time = time.time()
+
     def update_meteors(self, screen):
         """Cập nhật vị trí và trạng thái của thiên thạch"""
         for meteor in self.meteors:
             meteor.move()
             meteor.draw(screen)
         # Xóa thiên thạch ra khỏi màn hình
-        self.meteors = [meteor for meteor in self.meteors if not meteor.off_screen(screen_height)]
+        self.meteors = [
+            meteor for meteor in self.meteors if not meteor.off_screen(screen_height)
+        ]
+
     def check_meteor_collisions(self, player, enemies):
         """Kiểm tra va chạm của thiên thạch"""
         for meteor in self.meteors:
             # Va chạm giữa thiên thạch và người chơi
             if player.rect.colliderect(meteor.rect):
                 player.health -= 5  # Trừ máu người chơi
-                
+
                 # Nếu máu người chơi <= 0, trừ mạng và reset máu
                 if player.health <= 0:
                     player.lives -= 1  # Trừ một mạng
-                    player.health = 100  # Reset máu về 100 (hoặc giá trị tối đa của bạn)
-                    
+                    player.health = (
+                        100  # Reset máu về 100 (hoặc giá trị tối đa của bạn)
+                    )
+
                     # Kiểm tra nếu người chơi hết mạng
                     if player.lives <= 0:
                         return True
@@ -80,7 +97,7 @@ class Game:
     def game_loop(self, screen, spaceship_data):
         player = Player(spaceship_data, screen_width, screen_height)
         enemies = []
-        score = 0   
+        score = 0
         running = True
 
         clock = pygame.time.Clock()
@@ -101,29 +118,37 @@ class Game:
 
             if keys[pygame.K_SPACE]:
                 player.shoot()
+                self.shoot_sound.play()
 
             player.update_bullets()
 
-            #spawn boss when reach required score
-            if score % 2 == 0 and score > 0 and score != self.last_boss and not self.boss_active:
+            # spawn boss when reach required score
+            if (
+                score % 2 == 0
+                and score > 0
+                and score != self.last_boss
+                and not self.boss_active
+            ):
                 self.boss = Boss()
                 self.boss_active = True
                 self.last_boss = score  # Update last boss score
                 self.boss_spawntime = time.time()
-                self.boss_action =time.time()
+                self.boss_action = time.time()
 
             # Spawn things if boss not active
             if not self.boss_active:
                 # Spawn enemies at intervals
-                if random.randint(0, max(abs(100-score),50)) == 0:
+                if random.randint(0, max(abs(100 - score), 50)) == 0:
                     enemies.append(
                         Enemy(
-                            random.randint(0, screen_width - enemy_width), -enemy_height, 0
+                            random.randint(0, screen_width - enemy_width),
+                            -enemy_height,
+                            0,
                         )
                     )
-            
+
                 # Spawn enemies in formations
-                if random.randint(0, max(abs(500-score),500)) == 0:
+                if random.randint(0, max(abs(500 - score), 500)) == 0:
                     enemies = enemies + new_formation(score)
 
                 # Drop items at regular intervals
@@ -132,7 +157,7 @@ class Game:
                     new_item = DropItem(screen_width, screen_height)
                     self.items.append(new_item)
                     self.last_item_drop_time = current_time
-                
+
                 # Cập nhật và xử lý thiên thạch
                 self.spawn_meteor()
                 self.update_meteors(screen)
@@ -142,71 +167,94 @@ class Game:
                     running = False
                     continue  # Thoát khỏi vòng lặp game
 
-                    
             # Delay for boss spawn and death
             if self.boss_active:
-                if time.time() - self.boss_spawntime <5 and time.time() - self.boss_spawntime >= 2 and self.boss_spawntime != 0:
+                if (
+                    time.time() - self.boss_spawntime < 5
+                    and time.time() - self.boss_spawntime >= 2
+                    and self.boss_spawntime != 0
+                ):
                     elapsed_time = time.time() - self.boss_spawntime
-                    frame_index = int(elapsed_time * 20) % 20 
+                    frame_index = int(elapsed_time * 20) % 20
 
                     # Load the corresponding image
                     warning_image_path = f"Images/warning/warning{frame_index + 1}.png"
-                    warning_image = pygame.image.load(warning_image_path).convert_alpha()
+                    warning_image = pygame.image.load(
+                        warning_image_path
+                    ).convert_alpha()
 
                     # Center the image on the screen
-                    warning_rect = warning_image.get_rect(center=(screen_width // 2, screen_height // 2))
+                    warning_rect = warning_image.get_rect(
+                        center=(screen_width // 2, screen_height // 2)
+                    )
                     screen.blit(warning_image, warning_rect)
 
-                if time.time() - self.boss_spawntime >= 5 and self.boss_spawntime!=0:
+                if time.time() - self.boss_spawntime >= 5 and self.boss_spawntime != 0:
                     self.boss.move()  # Move boss downward to the target position
                     self.boss.draw(screen)  # Draw the boss
-                
-                elif time.time() - self.boss_deathtime >= 4 and self.boss_deathtime!=0:
-                    self.boss_deathtime =0
+
+                elif (
+                    time.time() - self.boss_deathtime >= 4 and self.boss_deathtime != 0
+                ):
+                    self.boss_deathtime = 0
                     self.boss_active = False
 
             # Boss actions
             if self.boss:
                 if not self.boss_act and time.time() - self.boss_action >= 10:
-                    self.boss_action = random.choice([time.time() - 10,time.time() -27])
+                    self.boss_action = random.choice(
+                        [time.time() - 10, time.time() - 27]
+                    )
                     self.boss_act = True
-                if (time.time()- self.boss_action) >=10 and (time.time()- self.boss_action) < 25:
+                if (time.time() - self.boss_action) >= 10 and (
+                    time.time() - self.boss_action
+                ) < 25:
                     self.boss.attack1()
                 self.boss.update_bullets()
-                if (time.time()- self.boss_action) >=25 and (time.time()- self.boss_action) <=26:
-                    self.boss_act=False
-                    self.boss_action = time.time()-7
-                if(time.time() - self.boss_action) >26 and (time.time()- self.boss_action) < 35:
+                if (time.time() - self.boss_action) >= 25 and (
+                    time.time() - self.boss_action
+                ) <= 26:
+                    self.boss_act = False
+                    self.boss_action = time.time() - 7
+                if (time.time() - self.boss_action) > 26 and (
+                    time.time() - self.boss_action
+                ) < 35:
                     if not self.boss.charging and not self.boss.beam_active:
-                        target_x = player.rect.centerx -boss_width/2
-                    if(self.boss.rect.x < target_x-5):
-                        self.boss.rect.x += boss_speed*7
-                    if(self.boss.rect.x > target_x +5):
-                        self.boss.rect.x -= boss_speed*7
+                        target_x = player.rect.centerx - boss_width / 2
+                    if self.boss.rect.x < target_x - 5:
+                        self.boss.rect.x += boss_speed * 7
+                    if self.boss.rect.x > target_x + 5:
+                        self.boss.rect.x -= boss_speed * 7
                     self.boss.attack2()
-                if(time.time() - self.boss_action) >=36 and (time.time()- self.boss_action) <= 37:
-                    self.boss_act=False
-                    self.boss_action = time.time()-7
+                if (time.time() - self.boss_action) >= 36 and (
+                    time.time() - self.boss_action
+                ) <= 37:
+                    self.boss_act = False
+                    self.boss_action = time.time() - 7
                 self.boss.update_attack2()
                 if self.boss.beam_active:
-                # Check for beam collision with player
+                    # Check for beam collision with player
                     beam_rect = pygame.Rect(
                         self.boss.rect.centerx - beam_width // 2,
                         self.boss.rect.bottom,
                         beam_width,
-                        beam_height
+                        beam_height,
                     )
-                    if beam_rect.colliderect(pygame.Rect(player.x, player.y, spaceship_width, spaceship_height)):
+                    if beam_rect.colliderect(
+                        pygame.Rect(
+                            player.x, player.y, spaceship_width, spaceship_height
+                        )
+                    ):
                         if player.lose_health_dot():
                             running = False
-                            self.boss_active=False
+                            self.boss_active = False
                             self.boss = None
 
             # Move and display enemies
             for enemy in enemies:
                 enemy.move()
                 enemy.draw(screen)
-                if random.randint(0, max(abs(250-score),150)) == 0:
+                if random.randint(0, max(abs(250 - score), 150)) == 0:
                     enemy.shoot()
                 enemy.update_bullets()
 
@@ -215,7 +263,9 @@ class Game:
                 if self.boss:
                     if bullet.colliderect(self.boss.rect):
                         player.bullets.remove(bullet)
-                        self.boss.health -= player.damage  # Reduce boss health by player's damage
+                        self.boss.health -= (
+                            player.damage
+                        )  # Reduce boss health by player's damage
                         if self.boss.health <= 0:
                             score += 5  # Add score on boss defeat
                             self.boss = None  # Remove the boss
@@ -227,15 +277,16 @@ class Game:
                         player.bullets.remove(bullet)
                         enemies.remove(enemy)
                         score += 1
+                        self.enemy_hit_sound.play()
                         break
-            
+
             # Check for player-boss collision
             if self.boss and self.boss.rect.colliderect(
                 pygame.Rect(player.x, player.y, player.width, player.height)
             ):
                 if player.lose_health_dot():
-                    running=False
-                    self.boss_active=False
+                    running = False
+                    self.boss_active = False
                     self.boss = None
 
             # Check for player-enemy bullet collision
@@ -250,7 +301,7 @@ class Game:
                         if player.lose_health():
                             running = False
                             if self.boss_active:
-                                self.boss_active=False
+                                self.boss_active = False
                                 self.boss = None
 
             # Check for player-boss bullet collision
@@ -264,7 +315,7 @@ class Game:
                         self.boss.bullets.remove(bullet)
                         if player.lose_health():
                             running = False
-                            self.boss_active=False
+                            self.boss_active = False
                             self.boss = None
 
             # Check for player-enemy collision
@@ -276,7 +327,7 @@ class Game:
                     if player.lose_health():
                         running = False
                         if self.boss_active:
-                            self.boss_active=False
+                            self.boss_active = False
                             self.boss = None
 
             # Check for player-item collision
@@ -284,7 +335,7 @@ class Game:
                 if player.rect.colliderect(item.rect):
                     self.apply_item_effect(player, item, enemies)
                     self.items.remove(item)
-
+                    self.item_pickup_sound.play()
 
             # Remove enemies that are off-screen
             enemies = [enemy for enemy in enemies if enemy.rect.y < screen_height]
@@ -366,12 +417,12 @@ class Game:
 
             if blink:
                 menu_surface = text_font.render(
-                    "Press M to return to Main Menu", True, (22,11,33)
+                    "Press M to return to Main Menu", True, (22, 11, 33)
                 )
                 menu_rect = menu_surface.get_rect(center=(screen.get_width() // 2, 350))
                 screen.blit(menu_surface, menu_rect)
 
-                quit_surface = text_font.render("Press Q to Quit", True, (22,11,33))
+                quit_surface = text_font.render("Press Q to Quit", True, (22, 11, 33))
                 quit_rect = quit_surface.get_rect(center=(screen.get_width() // 2, 400))
                 screen.blit(quit_surface, quit_rect)
 
@@ -395,7 +446,6 @@ class Game:
                     elif event.key == pygame.K_q:
                         pygame.quit()  # Quit the game if 'Q' is pressed
                         quit()
-
 
     def run(self, screen):
         while True:

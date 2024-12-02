@@ -9,13 +9,16 @@ from constants import *
 pygame.mixer.init()
 
 # Tải và phát nhạc nền
-pygame.mixer.music.load('Sounds/sci_fi_adventure.mp3')  # Đường dẫn tới tệp nhạc của bạn
+pygame.mixer.music.load("Sounds/sci_fi_adventure.mp3")  # Đường dẫn tới tệp nhạc của bạn
 pygame.mixer.music.play(-1)  # Phát lặp vô hạn
-pygame.mixer.music.set_volume(0.03)  # Điều chỉnh âm lượng (0.0 - 1.0)
+pygame.mixer.music.set_volume(0.2)  # Điều chỉnh âm lượng (0.0 - 1.0)
+
+
 def draw_text(text, x, y, screen, color=white, font_size=35):
     font = pygame.font.SysFont("Arial", font_size)
     screen_text = font.render(text, True, color)
     screen.blit(screen_text, (x, y))
+
 
 def draw_gradient(screen, color1, color2):
     height = screen.get_height()
@@ -27,6 +30,7 @@ def draw_gradient(screen, color1, color2):
         )
         pygame.draw.line(screen, color, (0, i), (screen.get_width(), i))
 
+
 # Hàm vẽ menu chọn tàu vũ trụ
 def spaceship_selection_menu(screen, config):
     spaceships = config["spaceships"]
@@ -35,7 +39,7 @@ def spaceship_selection_menu(screen, config):
 
     # Thiết lập font chữ
     font_title = pygame.font.Font(None, 48)  # Giảm kích thước font tiêu đề
-    font_info = pygame.font.Font(None, 28)   # Giảm kích thước font thông tin tàu vũ trụ
+    font_info = pygame.font.Font(None, 28)  # Giảm kích thước font thông tin tàu vũ trụ
     font_description = pygame.font.Font(None, 20)  # Giảm kích thước font mô tả
     font_instruction = pygame.font.Font(None, 24)  # Giảm kích thước font hướng dẫn
 
@@ -46,7 +50,9 @@ def spaceship_selection_menu(screen, config):
         # Hiển thị tiêu đề
         title = "CHOOSE YOUR SPACESHIP"
         title_surface = font_title.render(title, True, yellow)
-        title_rect = title_surface.get_rect(center=(screen.get_width() / 2, 40))  # Điều chỉnh vị trí
+        title_rect = title_surface.get_rect(
+            center=(screen.get_width() / 2, 40)
+        )  # Điều chỉnh vị trí
         screen.blit(title_surface, title_rect)
 
         # Hiển thị thông tin từng tàu vũ trụ
@@ -54,14 +60,20 @@ def spaceship_selection_menu(screen, config):
             # Hiệu ứng làm nổi bật tàu vũ trụ được chọn
             if i == selected_index:
                 bg_rect = pygame.Rect(80, 100 + i * 120, 740, 100)
-                pygame.draw.rect(screen, (50, 50, 100), bg_rect, border_radius=10)  # Nền mờ
-                pygame.draw.rect(screen, border_color, bg_rect, 3, border_radius=10)  # Viền phát sáng
+                pygame.draw.rect(
+                    screen, (50, 50, 100), bg_rect, border_radius=10
+                )  # Nền mờ
+                pygame.draw.rect(
+                    screen, border_color, bg_rect, 3, border_radius=10
+                )  # Viền phát sáng
 
             color = neon_blue if i == selected_index else white
 
             # Vẽ thông tin máy bay
             name_surface = font_info.render(spaceship["name"], True, color)
-            name_rect = name_surface.get_rect(topleft=(120, 110 + i * 120))  # Điều chỉnh vị trí
+            name_rect = name_surface.get_rect(
+                topleft=(120, 110 + i * 120)
+            )  # Điều chỉnh vị trí
             screen.blit(name_surface, name_rect)
 
             description_surface = font_description.render(
@@ -69,7 +81,9 @@ def spaceship_selection_menu(screen, config):
                 True,
                 color,
             )
-            description_rect = description_surface.get_rect(topleft=(120, 150 + i * 120))  # Điều chỉnh vị trí
+            description_rect = description_surface.get_rect(
+                topleft=(120, 150 + i * 120)
+            )  # Điều chỉnh vị trí
             screen.blit(description_surface, description_rect)
 
             # Hiển thị hình ảnh tàu vũ trụ với hiệu ứng phóng to nếu được chọn
@@ -77,19 +91,33 @@ def spaceship_selection_menu(screen, config):
                 os.path.join(spaceship["image_folder"], "player1.png")
             ).convert_alpha()
             if i == selected_index:
-                spaceship_image = pygame.transform.scale(spaceship_image, (120, 120))  # Điều chỉnh kích thước
-                screen.blit(spaceship_image, (620, 100 + i * 120 - 10))  # Điều chỉnh vị trí
+                spaceship_image = pygame.transform.scale(
+                    spaceship_image, (120, 120)
+                )  # Điều chỉnh kích thước
+                screen.blit(
+                    spaceship_image, (620, 100 + i * 120 - 10)
+                )  # Điều chỉnh vị trí
             else:
-                spaceship_image = pygame.transform.scale(spaceship_image, (80, 80))  # Điều chỉnh kích thước
+                spaceship_image = pygame.transform.scale(
+                    spaceship_image, (80, 80)
+                )  # Điều chỉnh kích thước
                 screen.blit(spaceship_image, (640, 110 + i * 120))  # Điều chỉnh vị trí
 
         # Hiển thị hướng dẫn điều khiển
-        instruction_surface = font_instruction.render("Press UP/DOWN to navigate", True, light_blue)
-        instruction_rect = instruction_surface.get_rect(center=(screen.get_width() / 2, 460))  # Điều chỉnh vị trí
+        instruction_surface = font_instruction.render(
+            "Press UP/DOWN to navigate", True, light_blue
+        )
+        instruction_rect = instruction_surface.get_rect(
+            center=(screen.get_width() / 2, 460)
+        )  # Điều chỉnh vị trí
         screen.blit(instruction_surface, instruction_rect)
 
-        instruction_surface = font_instruction.render("Press ENTER to select", True, light_blue)
-        instruction_rect = instruction_surface.get_rect(center=(screen.get_width() / 2, 500))  # Điều chỉnh vị trí
+        instruction_surface = font_instruction.render(
+            "Press ENTER to select", True, light_blue
+        )
+        instruction_rect = instruction_surface.get_rect(
+            center=(screen.get_width() / 2, 500)
+        )  # Điều chỉnh vị trí
         screen.blit(instruction_surface, instruction_rect)
 
         # Cập nhật màn hình
@@ -106,6 +134,7 @@ def spaceship_selection_menu(screen, config):
                     selected_index = (selected_index + 1) % len(spaceships)
                 elif event.key == pygame.K_RETURN:
                     return spaceships[selected_index]
+
 
 def main_menu(screen, high_score_manager):
     # Load the menu background image
@@ -138,7 +167,9 @@ def main_menu(screen, high_score_manager):
         for i, option in enumerate(menu_options):
             color = (255, 223, 0) if i == selected_option else (200, 200, 200)
             option_surface = option_font.render(option, True, color)
-            option_rect = option_surface.get_rect(center=(screen_width // 2, 200 + i * 80))
+            option_rect = option_surface.get_rect(
+                center=(screen_width // 2, 200 + i * 80)
+            )
             screen.blit(option_surface, option_rect)
 
         pygame.display.flip()
@@ -193,12 +224,18 @@ def show_high_score(screen, high_score_manager):
                 glow_increasing = True
 
         # Create a transparent surface for the glowing rectangle
-        glow_surface = pygame.Surface((screen.get_width(), screen.get_height()), pygame.SRCALPHA)
+        glow_surface = pygame.Surface(
+            (screen.get_width(), screen.get_height()), pygame.SRCALPHA
+        )
         glow_color = (255, 223, 0, glow_alpha)  # RGBA with alpha
-        
+
         # Create rectangle
-        title_rect = pygame.Rect(screen.get_width() // 2 - 200, 100, 400, 80)  # Rect for title
-        pygame.draw.rect(glow_surface, glow_color[:3], title_rect.inflate(50, 30), border_radius=20)
+        title_rect = pygame.Rect(
+            screen.get_width() // 2 - 200, 100, 400, 80
+        )  # Rect for title
+        pygame.draw.rect(
+            glow_surface, glow_color[:3], title_rect.inflate(50, 30), border_radius=20
+        )
 
         # Blit the glow surface onto the main screen
         screen.blit(glow_surface, (0, 0))
@@ -219,7 +256,9 @@ def show_high_score(screen, high_score_manager):
         instruction_surface = instruction_font.render(
             "Press M to return to Main Menu", True, (200, 200, 200)
         )
-        instruction_rect = instruction_surface.get_rect(center=(screen.get_width() // 2, 350))
+        instruction_rect = instruction_surface.get_rect(
+            center=(screen.get_width() // 2, 350)
+        )
         screen.blit(instruction_surface, instruction_rect)
 
         # Update the screen
@@ -231,7 +270,6 @@ def show_high_score(screen, high_score_manager):
                 return "exit"
             elif event.type == pygame.KEYUP and event.key == pygame.K_m:
                 return "main_menu"
-
 
 
 if __name__ == "__main__":
@@ -249,7 +287,9 @@ if __name__ == "__main__":
             spaceship_data = spaceship_selection_menu(screen, config)
             if spaceship_data is None:
                 break  # Thoát nếu người dùng đóng game
-            result = game.game_loop(screen, spaceship_data)  # Truyền thông tin máy bay vào game loop
+            result = game.game_loop(
+                screen, spaceship_data
+            )  # Truyền thông tin máy bay vào game loop
             if result == "exit":
                 break
         elif action == "show_high_score":
