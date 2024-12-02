@@ -97,6 +97,8 @@ def formation4(score):
     center_y = -4*enemy_height
     formation.append (Enemy(center_x,center_y,4))
     num_enemies = score //10
+    if num_enemies == 0:
+        num_enemies +=1
     #um_enemies= 8
     radius = enemy_width * 2
     for i in range(num_enemies+1):

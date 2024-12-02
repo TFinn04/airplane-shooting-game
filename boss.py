@@ -1,4 +1,6 @@
 import pygame
+import os
+import random
 from constants import *
 import time
 
@@ -11,11 +13,40 @@ class Boss:
             boss_width,
             boss_height
         )
+        
+        # Select a random folder for boss images
+        self.boss_images_folder = random.choice([
+            "Images/bosses/boss1/", 
+            "Images/bosses/boss2/", 
+            "Images/bosses/boss3/"
+        ])
+        
+        self.boss_animation_frames = []
+
+        # Load các frame animation của boss từ thư mục được chọn
+        for filename in sorted(os.listdir(self.boss_images_folder)):  # Đảm bảo thứ tự sắp xếp
+            if filename.endswith(".png"):
+                boss_frame = pygame.image.load(os.path.join(self.boss_images_folder, filename)).convert_alpha()
+                self.boss_animation_frames.append(boss_frame)
+        self.boss_frame_counter = 0
+        self.boss_animation_speed = 5
+        self.current_boss_frame = 0
+        
         self.health = boss_health
-        self.image = pygame.image.load("Images/boss.png").convert_alpha()
         self.direction = 1  # 1 for right, -1 for left
         self.bullets = []
-        self.bullet_image = pygame.image.load("Images/enemy_bullet.png").convert_alpha()
+        
+        # Load animation frames for boss bullets
+        self.bullet_frames = []
+        self.bullet_anim_folder = "Images/enemy_bullet/"  # Path to bullet animation frames
+        for filename in sorted(os.listdir(self.bullet_anim_folder)):  # Ensure sorted order
+            if filename.endswith(".png"):
+                bullet_frame = pygame.image.load(os.path.join(self.bullet_anim_folder, filename)).convert_alpha()
+                self.bullet_frames.append(bullet_frame)
+        self.current_bullet_frame = 0
+        self.bullet_animation_speed = 10  # Speed of bullet animation
+        self.bullet_frame_counter = 0
+        
         self.last_shot_time = pygame.time.get_ticks()
         self.charging = False
         self.charge_start_time = 0
@@ -39,13 +70,13 @@ class Boss:
         
         self.rect.x += boss_speed * self.direction
 
-        # Shooting mechanism
+        # Shooting mechanism with animation
         current_time = pygame.time.get_ticks()
         if current_time - self.last_shot_time > 300:  # Fire every 0.3 seconds
             # Bullet from left wing
-            self.bullets.append(pygame.Rect(self.rect.x + self.rect.x//6, self.rect.centery - self.rect.y, self.bullet_image.get_width(), self.bullet_image.get_height()))
+            self.bullets.append(pygame.Rect(self.rect.x + self.rect.x//6, self.rect.centery - self.rect.y, self.bullet_frames[0].get_width(), self.bullet_frames[0].get_height()))
             # Bullet from right wing
-            self.bullets.append(pygame.Rect(self.rect.right- self.rect.x//6 - self.bullet_image.get_width(), self.rect.centery - self.rect.y, self.bullet_image.get_width(), self.bullet_image.get_height()))
+            self.bullets.append(pygame.Rect(self.rect.right- self.rect.x//6 - self.bullet_frames[0].get_width(), self.rect.centery - self.rect.y, self.bullet_frames[0].get_width(), self.bullet_frames[0].get_height()))
             self.last_shot_time = current_time
     
     def attack2(self):
@@ -74,11 +105,23 @@ class Boss:
             self.rect.x += boss_speed * self.direction
 
     def draw(self, screen):
-        # Draw the boss image
-        screen.blit(self.image, (self.rect.x, self.rect.y))
-        # Draw bullets
+        # Draw the boss animation frame
+        self.boss_frame_counter += 1
+        if self.boss_frame_counter >= self.boss_animation_speed:
+            self.current_boss_frame = (self.current_boss_frame + 1) % len(self.boss_animation_frames)
+            self.boss_frame_counter = 0
+
+        screen.blit(self.boss_animation_frames[self.current_boss_frame], (self.rect.x, self.rect.y))
+
+        # Draw bullets with animation
         for bullet in self.bullets:
-            screen.blit(self.bullet_image, (bullet.x, bullet.y))
+            # Animate the bullets
+            self.bullet_frame_counter += 1
+            if self.bullet_frame_counter >= self.bullet_animation_speed:
+                self.current_bullet_frame = (self.current_bullet_frame + 1) % len(self.bullet_frames)
+                self.bullet_frame_counter = 0
+
+            screen.blit(self.bullet_frames[self.current_bullet_frame], (bullet.x, bullet.y))
         
         if self.charging:
             elapsed_time = time.time() - self.charge_start_time
