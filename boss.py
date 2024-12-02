@@ -6,6 +6,11 @@ import time
 
 class Boss:
     def __init__(self):
+        pygame.mixer.init()
+        self.boss_charge = pygame.mixer.Sound("Sounds/boss_charge.wav")
+        self.boss_beam = pygame.mixer.Sound("Sounds/boss_beam.wav")
+        self.boss_charge.set_volume(0.25)
+        self.boss_beam.set_volume(0.25)
         # Initialize boss position at the middle top of the screen
         self.rect = pygame.Rect(
             (screen_width - boss_width) // 2, 
@@ -86,12 +91,14 @@ class Boss:
 
     def update_attack2(self):
         if self.charging:
+            self.boss_charge.play()
             if time.time() - self.charge_start_time >= 2:  # Charging duration
                 self.charging = False
                 self.beam_active = True
                 self.beam_start_time = time.time()
 
         if self.beam_active:
+            self.boss_beam.play()
             if time.time() - self.beam_start_time >= 2:  # Beam duration
                 self.beam_active = False
 
