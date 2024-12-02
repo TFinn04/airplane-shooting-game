@@ -127,3 +127,21 @@ class Player:
             if self.lives <= 0:
                 return True  # Kết thúc trò chơi (không còn mạng)
         return False  # Người chơi vẫn còn sống
+    
+    def lose_health_dot(self):
+        # Lá chắn hấp thụ sát thương trước, nếu đang hoạt động
+        if self.shield > 0:
+            self.shield -= damage_per_collision
+            if self.shield < 0:
+                self.health += self.shield  # Sát thương dư sẽ chuyển sang máu
+                self.shield = 0  # Lá chắn bị phá hủy
+        else:
+            self.health -= damage_over_time
+
+        # Kiểm tra nếu máu bị cạn, xử lý giảm số mạng
+        if self.health <= 0:
+            self.lives -= 1
+            self.health = max_health
+            if self.lives <= 0:
+                return True  # Kết thúc trò chơi (không còn mạng)
+        return False  # Người chơi vẫn còn sống
