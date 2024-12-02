@@ -3,6 +3,7 @@ from player import Player
 from enemy import Enemy
 from high_score_manager import HighScoreManager
 from constants import *
+from background_elements import *
 import random
 from enemy_formation import *
 from drop_item import DropItem  # Import DropItem
@@ -23,6 +24,7 @@ class Game:
         self.meteors = []  # Danh sách thiên thạch
         self.meteor_spawn_interval = 3.5  # Khoảng thời gian tạo thiên thạch (giây)
         self.last_meteor_spawn_time = time.time()
+        self.last_planet_spawn_time = time.time()
         self.boss_active = False  # Flag to track if boss spawn is active
         self.last_boss = 0  # Track last score milestone for boss appearance
         self.boss = None
@@ -30,6 +32,7 @@ class Game:
         self.boss_deathtime = 0
         self.boss_act = False
         self.boss_action = 0
+        self.cheat = True
 
     def draw_text(self, text, x, y, screen, color=white):
         font = pygame.font.SysFont("Arial", 35)
@@ -92,8 +95,10 @@ class Game:
         player = Player(spaceship_data, screen_width, screen_height)
         enemies = []
         bullets = []
+        planets = []
         score = 0   
         running = True
+        cheat = True
         bullet_image = pygame.image.load(
             "Images/enemy_bullet.png")
         
@@ -109,15 +114,50 @@ class Game:
                 if event.type == pygame.KEYUP:
                     if event.key == pygame.K_SPACE:
                         player.can_shoot = True
+                    if pygame.K_0 <= event.key <= pygame.K_5:
+                        cheat = True
 
             keys = pygame.key.get_pressed()
+            
             player.move(keys)
-
+            
             if keys[pygame.K_SPACE]:
                 player.shoot()
+            
+            
+            if cheat:
+                if keys[pygame.K_0]:
+                    enemies.append(Enemy(screen_width//2,-enemy_height,0))
+                    cheat = False
+                if keys[pygame.K_1]:
+                    enemies = enemies + formation1(score)
+                    cheat = False
+                if keys[pygame.K_2]:
+                    enemies = enemies + formation2(score)
+                    cheat = False
+                if keys[pygame.K_3]:
+                    enemies = enemies + formation3(score)
+                    cheat = False
+                if keys[pygame.K_4]:
+                    enemies = enemies + formation4(score)
+                    cheat = False
+                if keys[pygame.K_5]:
+                    self.boss = Boss()
+                    self.boss_active = True
+                    self.last_boss = score  # Update last boss score
+                    self.boss_spawntime = time.time()
+                    self.boss_action =time.time()
+                    cheat = False
 
             player.update_bullets()
-
+            #spawn planets as background element
+            #if time.time() - self.last_planet_spawn_time > 10:
+            #   planets.append(Planets(screen_width, screen_height))
+            #    self.last_planet_spawn_time = time.time()
+            #for planet in planets:
+            #    planet.move()
+            #    planet.draw(screen)
+            #planets = [planet for planet in planets if not planet.off_screen(screen_height)]
             #spawn boss when reach required score
             if score % 50 == 0 and score > 0 and score != self.last_boss and not self.boss_active:
                 self.boss = Boss()

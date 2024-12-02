@@ -17,6 +17,7 @@ def new_formation(score):
 
 def formation1(score):
     formation = []
+    #x: position of center enemy/ y: number of side enemies
     x = random.randint(screen_width // 4, (screen_width // 4) * 3)
     y = random.randint(2, max(2,score//50))
     pos = 0
@@ -83,7 +84,7 @@ def formation3(score):
 
     layers = random.randint(100, 400)
 
-    for i in range(random.randint(score//50, score//25)):
+    for i in range(random.randint(max(score//50,3), max(score//25,5))):
         for layer in range(0, layers, enemy_height * 2):
             formation.append(Enemy(-enemy_width * i, layer, 3))
             formation.append(
@@ -96,11 +97,10 @@ def formation4(score):
     center_x = random.randint(0,screen_width- enemy_width*3)
     center_y = -4*enemy_height
     formation.append (Enemy(center_x,center_y,4))
-    num_enemies = score //10
-    if num_enemies == 0:
-        num_enemies +=1
+    num_enemies = max(score //10,4)
+  
     #um_enemies= 8
-    radius = enemy_width * 2
+    radius = enemy_width * 1.5
     for i in range(num_enemies+1):
         angle = i * (2 * math.pi / num_enemies)
         x = center_x + radius * math.cos(angle)
