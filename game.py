@@ -113,7 +113,7 @@ class Game:
         self.meteors = [
             meteor for meteor in self.meteors if not meteor.off_screen(screen_height)
         ]
-
+    
     def check_meteor_collisions(self, player, enemies):
         """Kiểm tra va chạm của thiên thạch"""
         for meteor in self.meteors:
@@ -150,6 +150,7 @@ class Game:
     def game_loop(self, screen, spaceship_data):
         player = Player(spaceship_data, screen_width, screen_height)
         enemies = []
+        bullets = []
         score = 0
         running = True
         cheat = True
@@ -359,8 +360,13 @@ class Game:
                 enemy.move()
                 enemy.draw(screen)
                 if random.randint(0, max(abs(250 - score), 150)) == 0:
-                    enemy.shoot()
-                enemy.update_bullets()
+                    bullets.append(self.enemy_shoot(enemy.rect.x,enemy.rect.y,screen))
+            for bullet in bullets:
+                bullet.y += enemy_bullet_speed
+                screen.blit(bullet_image, (bullet.x, bullet.y))
+
+            bullets = [
+            bullet for bullet in bullets if bullet.y < screen_height]
 
             # Check for bullet-enemy and bullet-boss collision
             for bullet in player.bullets:
