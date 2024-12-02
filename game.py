@@ -24,9 +24,22 @@ class Game:
         self.item_pickup_sound.set_volume(0.25)
 
         self.high_score_manager = HighScoreManager("high_score.txt")
-        self.background_image = pygame.image.load(
-            "Images/background.png"
-        ).convert()  # Load your background image
+                # Preload all background images
+        self.background_images = [
+            pygame.image.load(f"Images/background/background{i}.png").convert()
+            for i in range(1, 10)
+        ]
+        self.current_background_index = 0
+        self.last_background_switch_time = pygame.time.get_ticks()
+
+        self.game_over_images = [
+        pygame.image.load(f"Images/gameover/gameover{i}.png").convert()
+        for i in range(1, 12)  # Assuming images are named gameover1.png to gameover10.png
+        ]
+        self.current_game_over_index = 0
+        self.current_background_index = 0
+        self.last_game_over_switch_time = pygame.time.get_ticks()
+
         self.item_drop_interval = config["item_drop_interval"]  # Set item drop interval
         self.last_item_drop_time = pygame.time.get_ticks()
         self.items = []  # Khởi tạo danh sách vật phẩm
@@ -116,7 +129,15 @@ class Game:
         clock = pygame.time.Clock()
 
         while running:
-            screen.blit(self.background_image, (0, 0))  # Draw background
+            # Update background dynamically
+            current_time = pygame.time.get_ticks()
+            if current_time - self.last_background_switch_time > 100:
+                self.current_background_index = (self.current_background_index + 1) % len(self.background_images)
+                self.last_background_switch_time = current_time
+
+            # Draw the current background
+            screen.blit(self.background_images[self.current_background_index], (0, 0))
+
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -137,7 +158,7 @@ class Game:
 
             # spawn boss when reach required score
             if (
-                score % 2 == 0
+                score % 50 == 0
                 and score > 0
                 and score != self.last_boss
                 and not self.boss_active
@@ -376,12 +397,6 @@ class Game:
         return score
 
     def display_score(self, screen, score):
-        """Display the score after game over with enhanced visuals and effects."""
-        # Load and scale the background image
-        background_image = pygame.image.load("Images/game_over_background.png")
-        background_image = pygame.transform.scale(
-            background_image, (screen.get_width(), screen.get_height())
-        )
 
         # Load custom font (use a TTF file for sci-fi style fonts)
         try:
@@ -406,7 +421,12 @@ class Game:
         waiting_for_input = True
         while waiting_for_input:
             # Draw the background image
-            screen.blit(background_image, (0, 0))
+            current_time = pygame.time.get_ticks()
+            if current_time - self.last_game_over_switch_time > 100:
+                self.current_game_over_index = (self.current_game_over_index + 1) % len(self.game_over_images)
+                self.last_game_over_switch_time = current_time
+
+            screen.blit(self.game_over_images[self.current_game_over_index], (0, 0))
 
             # Apply zoom effect to "Game Over"
             if zoom_direction == 1:
@@ -431,18 +451,18 @@ class Game:
             screen.blit(title_surface, title_rect)
 
             # Render score and instructions
-            score_surface = text1_font.render(f"Score: {score}", True, (50, 50, 50))
+            score_surface = text1_font.render(f"Score: {score}", True, (176, 196, 222))
             score_rect = score_surface.get_rect(center=(screen.get_width() // 2, 250))
             screen.blit(score_surface, score_rect)
 
             if blink:
                 menu_surface = text_font.render(
-                    "Press M to return to Main Menu", True, (22, 11, 33)
+                    "Press M to return to Main Menu", True, (176, 196, 222)
                 )
                 menu_rect = menu_surface.get_rect(center=(screen.get_width() // 2, 350))
                 screen.blit(menu_surface, menu_rect)
 
-                quit_surface = text_font.render("Press Q to Quit", True, (22, 11, 33))
+                quit_surface = text_font.render("Press Q to Quit", True, (176, 196, 222))
                 quit_rect = quit_surface.get_rect(center=(screen.get_width() // 2, 400))
                 screen.blit(quit_surface, quit_rect)
 
