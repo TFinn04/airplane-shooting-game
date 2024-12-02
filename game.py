@@ -19,13 +19,9 @@ class Game:
         self.shoot_sound = pygame.mixer.Sound("Sounds/shoot.wav")
         self.enemy_hit_sound = pygame.mixer.Sound("Sounds/hit.wav")
         self.item_pickup_sound = pygame.mixer.Sound("Sounds/item_pickup.wav")
-        self.boss_charge = pygame.mixer.Sound("Sound/boss_charge.wav")
-        self.boss_beam = pygame.mixer.Sound("Sound/boss_beam.wav")
         self.shoot_sound.set_volume(0.25)
         self.enemy_hit_sound.set_volume(0.25)
         self.item_pickup_sound.set_volume(0.25)
-        self.boss_charge.set_volume(0.25)
-        self.boss_beam.set_volume(0.25)
 
         self.high_score_manager = HighScoreManager("high_score.txt")
         # Preload all background images
