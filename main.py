@@ -9,7 +9,7 @@ from constants import *
 pygame.mixer.init()
 
 # Tải và phát nhạc nền
-pygame.mixer.music.load("Sounds/sci_fi_adventure.mp3")  # Đường dẫn tới tệp nhạc của bạn
+pygame.mixer.music.load("Sounds/club.mp3")  # Đường dẫn tới tệp nhạc của bạn
 pygame.mixer.music.play(-1)  # Phát lặp vô hạn
 pygame.mixer.music.set_volume(0.2)  # Điều chỉnh âm lượng (0.0 - 1.0)
 
