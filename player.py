@@ -101,7 +101,6 @@ class Player:
             screen.blit(self.bullet_frames[self.current_bullet_frame], (bullet.x, bullet.y))
 
         # Vẽ thanh máu (màu xám nếu lá chắn đang hoạt động, màu xanh nếu không)
-        pygame.draw.rect(screen, white, (8, 48, self.max_health * 2 + 4, 24), 2)
         health_bar_color = (169, 169, 169) if self.shield > 0 else green
         pygame.draw.rect(screen, health_bar_color, (10, 50, self.health * 2, 20))
 
