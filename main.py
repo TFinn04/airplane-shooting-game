@@ -1,5 +1,6 @@
 import pygame
 import os
+import time
 from game import Game
 from high_score_manager import HighScoreManager
 from constants import *
@@ -29,7 +30,6 @@ def draw_gradient(screen, color1, color2):
             int(color1[2] + (color2[2] - color1[2]) * i / height),
         )
         pygame.draw.line(screen, color, (0, i), (screen.get_width(), i))
-
 
 # Hàm vẽ menu chọn tàu vũ trụ
 def spaceship_selection_menu(screen, config):
@@ -135,13 +135,20 @@ def spaceship_selection_menu(screen, config):
                 elif event.key == pygame.K_RETURN:
                     return spaceships[selected_index]
 
+def load_images_from_folder(folder_path):
+    images = []
+    for filename in sorted(os.listdir(folder_path), key=lambda x: int(x[4:-4])):
+        if filename.endswith(".png"):  # Load file ảnh có định dạng .png
+            image_path = os.path.join(folder_path, filename)
+            images.append(pygame.image.load(image_path).convert_alpha())
+    return images
 
 def main_menu(screen, high_score_manager):
-    # Load the menu background image
-    menu_background = pygame.image.load("Images/menu_background.png").convert()
-    menu_background = pygame.transform.scale(
-        menu_background, (screen_width, screen_height)
-    )
+    # Load the menu background animation frames
+    background_frames = load_images_from_folder("Images/menu")
+    frame_index = 0
+    last_update_time = time.time()  # Lưu thời gian frame cuối cùng được cập nhật
+    frame_delay = 0.04  # Độ trễ giữa các frame (tính bằng giây)
 
     # Load custom font for a more modern style
     try:
@@ -156,7 +163,19 @@ def main_menu(screen, high_score_manager):
     menu_options = ["Play", "Show High Score", "Reset High Score", "Exit"]
 
     while True:
-        screen.blit(menu_background, (0, 0))  # Draw the background image
+        # Update animation frame
+        current_time = time.time()
+        if current_time - last_update_time > frame_delay:
+            frame_index = (frame_index + 1) % len(background_frames)
+            last_update_time = current_time
+
+        # Draw animated background
+        screen.blit(
+            pygame.transform.scale(
+                background_frames[frame_index], (screen_width, screen_height)
+            ),
+            (0, 0),
+        )
 
         # Draw title
         title_surface = title_font.render("SPACE SHOOTER", True, (255, 223, 0))
@@ -299,4 +318,4 @@ if __name__ == "__main__":
         elif action == "exit":
             break
 
-    pygame.quit()
+    pygame.quit() 
