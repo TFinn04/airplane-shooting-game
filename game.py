@@ -19,12 +19,16 @@ class Game:
         self.shoot_sound = pygame.mixer.Sound("Sounds/shoot.wav")
         self.enemy_hit_sound = pygame.mixer.Sound("Sounds/hit.wav")
         self.item_pickup_sound = pygame.mixer.Sound("Sounds/item_pickup.wav")
+        self.boss_charge = pygame.mixer.Sound("Sound/boss_charge.wav")
+        self.boss_beam = pygame.mixer.Sound("Sound/boss_beam.wav")
         self.shoot_sound.set_volume(0.25)
         self.enemy_hit_sound.set_volume(0.25)
         self.item_pickup_sound.set_volume(0.25)
+        self.boss_charge.set_volume(0.25)
+        self.boss_beam.set_volume(0.25)
 
         self.high_score_manager = HighScoreManager("high_score.txt")
-                # Preload all background images
+        # Preload all background images
         self.background_images = [
             pygame.image.load(f"Images/background/background{i}.png").convert()
             for i in range(1, 10)
@@ -33,8 +37,10 @@ class Game:
         self.last_background_switch_time = pygame.time.get_ticks()
 
         self.game_over_images = [
-        pygame.image.load(f"Images/gameover/gameover{i}.png").convert()
-        for i in range(1, 12)  # Assuming images are named gameover1.png to gameover10.png
+            pygame.image.load(f"Images/gameover/gameover{i}.png").convert()
+            for i in range(
+                1, 12
+            )  # Assuming images are named gameover1.png to gameover10.png
         ]
         self.current_game_over_index = 0
         self.current_background_index = 0
@@ -53,24 +59,36 @@ class Game:
         self.boss_deathtime = 0
         self.boss_act = False
         self.boss_action = 0
-        
+
         # Preload images
         self.heart_icon = pygame.image.load("Images/lives.png").convert_alpha()
-        self.heart_icon = pygame.transform.scale(self.heart_icon, (30, 30))  # Resize as needed
+        self.heart_icon = pygame.transform.scale(
+            self.heart_icon, (30, 30)
+        )  # Resize as needed
 
         self.score_board = pygame.image.load("Images/score_board.png").convert_alpha()
-        self.score_board = pygame.transform.scale(self.score_board, (100, 30))  # Resize as needed
+        self.score_board = pygame.transform.scale(
+            self.score_board, (100, 30)
+        )  # Resize as needed
 
-    def draw_text(self, text, x, y, screen, font_path="Fonts/orbitron.ttf", font_size=30, color=white):
+    def draw_text(
+        self,
+        text,
+        x,
+        y,
+        screen,
+        font_path="Fonts/orbitron.ttf",
+        font_size=30,
+        color=white,
+    ):
         """Draw text with a custom font and style."""
         try:
             font = pygame.font.Font(font_path, font_size)
         except FileNotFoundError:
             font = pygame.font.SysFont("Arial", font_size)
-        
+
         text_surface = font.render(text, True, color)
         screen.blit(text_surface, (x, y))
-
 
     def apply_item_effect(self, player, item, enemies):
         """Apply the effect of the item to the player"""
@@ -132,12 +150,13 @@ class Game:
             # Update background dynamically
             current_time = pygame.time.get_ticks()
             if current_time - self.last_background_switch_time > 100:
-                self.current_background_index = (self.current_background_index + 1) % len(self.background_images)
+                self.current_background_index = (
+                    self.current_background_index + 1
+                ) % len(self.background_images)
                 self.last_background_switch_time = current_time
 
             # Draw the current background
             screen.blit(self.background_images[self.current_background_index], (0, 0))
-
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -384,7 +403,9 @@ class Game:
             screen.blit(self.score_board, (10, 10))
 
             # Draw the score text
-            self.draw_text("Score: "f"{score}", 30, 15, screen, font_size=18, color=(0, 0, 0))
+            self.draw_text(
+                "Score: " f"{score}", 30, 15, screen, font_size=18, color=(0, 0, 0)
+            )
 
             # Draw the lives icons
             for i in range(player.lives):
@@ -423,7 +444,9 @@ class Game:
             # Draw the background image
             current_time = pygame.time.get_ticks()
             if current_time - self.last_game_over_switch_time > 100:
-                self.current_game_over_index = (self.current_game_over_index + 1) % len(self.game_over_images)
+                self.current_game_over_index = (self.current_game_over_index + 1) % len(
+                    self.game_over_images
+                )
                 self.last_game_over_switch_time = current_time
 
             screen.blit(self.game_over_images[self.current_game_over_index], (0, 0))
@@ -462,7 +485,9 @@ class Game:
                 menu_rect = menu_surface.get_rect(center=(screen.get_width() // 2, 350))
                 screen.blit(menu_surface, menu_rect)
 
-                quit_surface = text_font.render("Press Q to Quit", True, (176, 196, 222))
+                quit_surface = text_font.render(
+                    "Press Q to Quit", True, (176, 196, 222)
+                )
                 quit_rect = quit_surface.get_rect(center=(screen.get_width() // 2, 400))
                 screen.blit(quit_surface, quit_rect)
 
