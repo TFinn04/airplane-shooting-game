@@ -20,9 +20,11 @@ class Game:
         self.shoot_sound = pygame.mixer.Sound("Sounds/shoot.wav")
         self.enemy_hit_sound = pygame.mixer.Sound("Sounds/hit.wav")
         self.item_pickup_sound = pygame.mixer.Sound("Sounds/item_pickup.wav")
+        self.meteor_sound = pygame.mixer.Sound("Sounds/meteor.wav")
         self.shoot_sound.set_volume(0.25)
         self.enemy_hit_sound.set_volume(0.25)
         self.item_pickup_sound.set_volume(0.25)
+        self.meteor_sound.set_volume(0.25)
 
         self.high_score_manager = HighScoreManager("high_score.txt")
         # Preload all background images
@@ -136,6 +138,7 @@ class Game:
             for enemy in enemies[:]:
                 if meteor.rect.colliderect(enemy.rect):
                     enemies.remove(enemy)  # Loại bỏ kẻ địch
+                    self.meteor_sound.play()
 
     # Add bullet at (x,y)
 
