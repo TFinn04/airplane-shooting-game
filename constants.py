@@ -44,6 +44,7 @@ enemy_bullet_speed = config["enemy_bullet_speed"]  # Tốc độ đạn của k�
 
 # Sát thương mỗi lần va chạm
 damage_per_collision = config["damage_per_collision"]  # Sát thương khi va chạm
+damage_over_time = config["damage_over_time"] #Sát thương đốt máu
 
 # Các hằng số liên quan đến vật phẩm
 item_drop_interval = config[

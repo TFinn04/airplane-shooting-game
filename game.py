@@ -145,7 +145,7 @@ class Game:
                     
             # Delay for boss spawn and death
             if self.boss_active:
-                if time.time() - self.boss_spawntime <= 5 and time.time() - self.boss_spawntime >= 2 and self.boss_spawntime != 0:
+                if time.time() - self.boss_spawntime <5 and time.time() - self.boss_spawntime >= 2 and self.boss_spawntime != 0:
                     elapsed_time = time.time() - self.boss_spawntime
                     frame_index = int(elapsed_time * 20) % 20 
 
@@ -157,7 +157,7 @@ class Game:
                     warning_rect = warning_image.get_rect(center=(screen_width // 2, screen_height // 2))
                     screen.blit(warning_image, warning_rect)
 
-                if time.time() - self.boss_spawntime >= 6 and self.boss_spawntime!=0:
+                if time.time() - self.boss_spawntime >= 5 and self.boss_spawntime!=0:
                     self.boss.move()  # Move boss downward to the target position
                     self.boss.draw(screen)  # Draw the boss
                 
@@ -170,15 +170,19 @@ class Game:
                 if not self.boss_act and time.time() - self.boss_action >= 10:
                     self.boss_action = random.choice([time.time() - 10,time.time() -27])
                     self.boss_act = True
-                if (time.time()- self.boss_action) >=10 and (time.time()- self.boss_action) <=22:
+                if (time.time()- self.boss_action) >=10 and (time.time()- self.boss_action) < 25:
                     self.boss.attack1()
-                if (time.time()- self.boss_action) <25 and (time.time()- self.boss_action) >22:
-                    self.boss.reposition()
                 self.boss.update_bullets()
                 if (time.time()- self.boss_action) >=25 and (time.time()- self.boss_action) <=26:
                     self.boss_act=False
-                    self.boss_action = time.time()-8
+                    self.boss_action = time.time()-7
                 if(time.time() - self.boss_action) >26 and (time.time()- self.boss_action) < 35:
+                    if not self.boss.charging and not self.boss.beam_active:
+                        target_x = player.rect.centerx -boss_width/2
+                    if(self.boss.rect.x < target_x-5):
+                        self.boss.rect.x += boss_speed*7
+                    if(self.boss.rect.x > target_x +5):
+                        self.boss.rect.x -= boss_speed*7
                     self.boss.attack2()
                 if(time.time() - self.boss_action) >=36 and (time.time()- self.boss_action) <= 37:
                     self.boss_act=False
@@ -193,7 +197,7 @@ class Game:
                         beam_height
                     )
                     if beam_rect.colliderect(pygame.Rect(player.x, player.y, spaceship_width, spaceship_height)):
-                        if player.lose_health():
+                        if player.lose_health_dot():
                             running = False
                             self.boss_active=False
                             self.boss = None
@@ -229,7 +233,7 @@ class Game:
             if self.boss and self.boss.rect.colliderect(
                 pygame.Rect(player.x, player.y, player.width, player.height)
             ):
-                if player.lose_health:
+                if player.lose_health_dot():
                     running=False
                     self.boss_active=False
                     self.boss = None

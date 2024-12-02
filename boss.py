@@ -55,7 +55,7 @@ class Boss:
 
     def move(self):
         # Existing move method for vertical movement
-        target_y = -boss_height//3
+        target_y = 0
         if self.rect.y < target_y:
             self.rect.y += boss_speed  # Move down
         else:
@@ -72,37 +72,28 @@ class Boss:
 
         # Shooting mechanism with animation
         current_time = pygame.time.get_ticks()
-        if current_time - self.last_shot_time > 300:  # Fire every 0.3 seconds
+        if current_time - self.last_shot_time > 500:  # Fire every 0.5 second
             # Bullet from left wing
-            self.bullets.append(pygame.Rect(self.rect.x + self.rect.x//6, self.rect.centery - self.rect.y, self.bullet_frames[0].get_width(), self.bullet_frames[0].get_height()))
+            self.bullets.append(pygame.Rect(self.rect.x , self.rect.centery - self.rect.y, self.bullet_frames[0].get_width(), self.bullet_frames[0].get_height()))
             # Bullet from right wing
-            self.bullets.append(pygame.Rect(self.rect.right- self.rect.x//6 - self.bullet_frames[0].get_width(), self.rect.centery - self.rect.y, self.bullet_frames[0].get_width(), self.bullet_frames[0].get_height()))
+            self.bullets.append(pygame.Rect(self.rect.right - self.bullet_frames[0].get_width(), self.rect.centery - self.rect.y, self.bullet_frames[0].get_width(), self.bullet_frames[0].get_height()))
             self.last_shot_time = current_time
     
     def attack2(self):
         if not self.charging and not self.beam_active:
-            self.charging = True
             self.charge_start_time = time.time()
+            self.charging = True
 
     def update_attack2(self):
         if self.charging:
-            if time.time() - self.charge_start_time >= 5:  # Charging duration
+            if time.time() - self.charge_start_time >= 2:  # Charging duration
                 self.charging = False
                 self.beam_active = True
                 self.beam_start_time = time.time()
 
         if self.beam_active:
-            if time.time() - self.beam_start_time >= 5:  # Beam duration
+            if time.time() - self.beam_start_time >= 2:  # Beam duration
                 self.beam_active = False
-
-    def reposition(self):
-        if self.rect.x <= 0:
-            self.direction = 1
-        elif self.rect.x >= screen_width - self.rect.width:
-            self.direction = -1
-        
-        if self.rect != pygame.Rect((screen_width - boss_width) // 2, self.rect.y, boss_width, boss_height):
-            self.rect.x += boss_speed * self.direction
 
     def draw(self, screen):
         # Draw the boss animation frame
@@ -128,7 +119,7 @@ class Boss:
             frame_index = int(elapsed_time * 121) % 121
             charge_image_path = f"Images/charge/charge{frame_index + 1}.png"
             charge_image = pygame.image.load(charge_image_path).convert_alpha()
-            charge_rect = charge_image.get_rect(center=(self.rect.centerx, self.rect.bottom + charge_size//2.5))
+            charge_rect = charge_image.get_rect(center=(self.rect.centerx, self.rect.bottom ))
             screen.blit(charge_image, charge_rect)
 
         if self.beam_active:
@@ -137,7 +128,7 @@ class Boss:
             beam_image_path = f"Images/beam/beam{frame_index + 1}.png"
             beam_image = pygame.image.load(beam_image_path).convert_alpha()
             
-            beam_rect = beam_image.get_rect(center=(self.rect.centerx, self.rect.bottom +beam_height//2.5))
+            beam_rect = beam_image.get_rect(center=(self.rect.centerx, self.rect.bottom +beam_height//2.7))
             screen.blit(beam_image, beam_rect)
 
     def take_damage(self, damage):
