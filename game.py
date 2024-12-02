@@ -113,7 +113,7 @@ class Game:
         self.meteors = [
             meteor for meteor in self.meteors if not meteor.off_screen(screen_height)
         ]
-    
+
     def check_meteor_collisions(self, player, enemies):
         """Kiểm tra va chạm của thiên thạch"""
         for meteor in self.meteors:
@@ -136,17 +136,19 @@ class Game:
             for enemy in enemies[:]:
                 if meteor.rect.colliderect(enemy.rect):
                     enemies.remove(enemy)  # Loại bỏ kẻ địch
-    #Add bullet at (x,y) 
-    
-    def enemy_shoot(self,X,Y,screen):
+
+    # Add bullet at (x,y)
+
+    def enemy_shoot(self, X, Y, screen):
         bullet = pygame.Rect(
             X + enemy_width // 2 - bullet_width // 2,
             Y + enemy_height,
             bullet_width,
-            bullet_height//3,
+            bullet_height // 3,
         )
-        
+
         return bullet
+
     def game_loop(self, screen, spaceship_data):
         player = Player(spaceship_data, screen_width, screen_height)
         enemies = []
@@ -154,9 +156,8 @@ class Game:
         score = 0
         running = True
         cheat = True
-        bullet_image = pygame.image.load(
-            "Images/enemy_bullet.png")
-        
+        bullet_image = pygame.image.load("Images/enemy_bullet.png")
+
         clock = pygame.time.Clock()
 
         while running:
@@ -182,16 +183,16 @@ class Game:
                         cheat = True
 
             keys = pygame.key.get_pressed()
-            
+
             player.move(keys)
-            
+
             if keys[pygame.K_SPACE]:
                 player.shoot()
-            
-            
+                self.shoot_sound.play()
+
             if cheat:
                 if keys[pygame.K_0]:
-                    enemies.append(Enemy(screen_width//2,-enemy_height,0))
+                    enemies.append(Enemy(screen_width // 2, -enemy_height, 0))
                     cheat = False
                 if keys[pygame.K_1]:
                     enemies = enemies + formation1(score)
@@ -210,29 +211,27 @@ class Game:
                     self.boss_active = True
                     self.last_boss = score  # Update last boss score
                     self.boss_spawntime = time.time()
-                    self.boss_action =time.time()
+                    self.boss_action = time.time()
                     cheat = False
-                self.shoot_sound.play()
 
             player.update_bullets()
-            #spawn planets as background element
-            #if time.time() - self.last_planet_spawn_time > 10:
+            # spawn planets as background element
+            # if time.time() - self.last_planet_spawn_time > 10:
             #   planets.append(Planets(screen_width, screen_height))
             #    self.last_planet_spawn_time = time.time()
-            #for planet in planets:
+            # for planet in planets:
             #    planet.move()
             #    planet.draw(screen)
-            #planets = [planet for planet in planets if not planet.off_screen(screen_height)]
-            #spawn boss when reach required score
-            
+            # planets = [planet for planet in planets if not planet.off_screen(screen_height)]
+            # spawn boss when reach required score
 
             # spawn boss when reach required score
             if (
-            score % 50 == 0
-            and score > 0
-            and score != self.last_boss
-            and not self.boss_active
-        ):
+                score % 50 == 0
+                and score > 0
+                and score != self.last_boss
+                and not self.boss_active
+            ):
                 self.boss = Boss()
                 self.boss_active = True
                 self.last_boss = score  # Update last boss score
@@ -353,20 +352,18 @@ class Game:
                             running = False
                             self.boss_active = False
                             self.boss = None
-            
-            
+
             # Move and display enemies
             for enemy in enemies:
                 enemy.move()
                 enemy.draw(screen)
                 if random.randint(0, max(abs(250 - score), 150)) == 0:
-                    bullets.append(self.enemy_shoot(enemy.rect.x,enemy.rect.y,screen))
+                    bullets.append(self.enemy_shoot(enemy.rect.x, enemy.rect.y, screen))
             for bullet in bullets:
                 bullet.y += enemy_bullet_speed
                 screen.blit(bullet_image, (bullet.x, bullet.y))
 
-            bullets = [
-            bullet for bullet in bullets if bullet.y < screen_height]
+            bullets = [bullet for bullet in bullets if bullet.y < screen_height]
 
             # Check for bullet-enemy and bullet-boss collision
             for bullet in player.bullets:
