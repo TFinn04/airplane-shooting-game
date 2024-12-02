@@ -40,11 +40,24 @@ class Game:
         self.boss_deathtime = 0
         self.boss_act = False
         self.boss_action = 0
+        
+        # Preload images
+        self.heart_icon = pygame.image.load("Images/lives.png").convert_alpha()
+        self.heart_icon = pygame.transform.scale(self.heart_icon, (30, 30))  # Resize as needed
 
-    def draw_text(self, text, x, y, screen, color=white):
-        font = pygame.font.SysFont("Arial", 35)
-        screen_text = font.render(text, True, color)
-        screen.blit(screen_text, [x, y])
+        self.score_board = pygame.image.load("Images/score_board.png").convert_alpha()
+        self.score_board = pygame.transform.scale(self.score_board, (100, 30))  # Resize as needed
+
+    def draw_text(self, text, x, y, screen, font_path="Fonts/orbitron.ttf", font_size=30, color=white):
+        """Draw text with a custom font and style."""
+        try:
+            font = pygame.font.Font(font_path, font_size)
+        except FileNotFoundError:
+            font = pygame.font.SysFont("Arial", font_size)
+        
+        text_surface = font.render(text, True, color)
+        screen.blit(text_surface, (x, y))
+
 
     def apply_item_effect(self, player, item, enemies):
         """Apply the effect of the item to the player"""
@@ -346,8 +359,15 @@ class Game:
                 item.move()
                 item.draw(screen)
 
-            self.draw_text(f"Score: {score}", 10, 10, screen)
-            self.draw_text(f"Lives: {player.lives}", 10, 80, screen)
+            # Draw the score board background
+            screen.blit(self.score_board, (10, 10))
+
+            # Draw the score text
+            self.draw_text("Score: "f"{score}", 30, 15, screen, font_size=18, color=(0, 0, 0))
+
+            # Draw the lives icons
+            for i in range(player.lives):
+                screen.blit(self.heart_icon, (10 + i * 45, 70))
 
             pygame.display.flip()
             clock.tick(60)
