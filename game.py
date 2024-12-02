@@ -56,6 +56,7 @@ class Game:
             meteor.draw(screen)
         # Xóa thiên thạch ra khỏi màn hình
         self.meteors = [meteor for meteor in self.meteors if not meteor.off_screen(screen_height)]
+    
     def check_meteor_collisions(self, player, enemies):
         """Kiểm tra va chạm của thiên thạch"""
         for meteor in self.meteors:
@@ -76,13 +77,26 @@ class Game:
             for enemy in enemies[:]:
                 if meteor.rect.colliderect(enemy.rect):
                     enemies.remove(enemy)  # Loại bỏ kẻ địch
-
+    #Add bullet at (x,y) 
+    
+    def enemy_shoot(self,X,Y,screen):
+        bullet = pygame.Rect(
+            X + enemy_width // 2 - bullet_width // 2,
+            Y + enemy_height,
+            bullet_width,
+            bullet_height//3,
+        )
+        
+        return bullet
     def game_loop(self, screen, spaceship_data):
         player = Player(spaceship_data, screen_width, screen_height)
         enemies = []
+        bullets = []
         score = 0   
         running = True
-
+        bullet_image = pygame.image.load(
+            "Images/enemy_bullet.png")
+        
         clock = pygame.time.Clock()
 
         while running:
@@ -197,14 +211,23 @@ class Game:
                             running = False
                             self.boss_active=False
                             self.boss = None
-
+            
+            
             # Move and display enemies
             for enemy in enemies:
                 enemy.move()
                 enemy.draw(screen)
                 if random.randint(0, max(abs(250-score),150)) == 0:
-                    enemy.shoot()
-                enemy.update_bullets()
+                    bullets.append(self.enemy_shoot(enemy.rect.x,enemy.rect.y,screen))
+                    
+                    
+                    
+            for bullet in bullets:
+                bullet.y += enemy_bullet_speed
+                screen.blit(bullet_image, (bullet.x, bullet.y))
+                bullets = [
+                    bullet for bullet in bullets if bullet.y > 0
+                ]     # Loại bỏ đạn bay hết hành trình
 
             # Check for bullet-enemy and bullet-boss collision
             for bullet in player.bullets:
@@ -236,13 +259,13 @@ class Game:
 
             # Check for player-enemy bullet collision
             for enemy in enemies:
-                for bullet in enemy.bullets:
+                for bullet in bullets:
                     if bullet.colliderect(
                         pygame.Rect(
                             player.x, player.y, spaceship_width, spaceship_height
                         )
                     ):
-                        enemy.bullets.remove(bullet)
+                        bullets.remove(bullet)
                         if player.lose_health():
                             running = False
                             if self.boss_active:

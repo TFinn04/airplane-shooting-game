@@ -1,18 +1,19 @@
 from enemy import Enemy
 from constants import *
-
+import math
 import random
 
 
 def new_formation(score):
-    x = random.randint(1, 3)
+    x = random.randint(1, 4)
     if x == 1:
         return formation1(score)
     if x == 2:
         return formation2(score)
     if x == 3:
         return formation3(score)
-    
+    if x == 4:
+        return formation4(score)
 
 def formation1(score):
     formation = []
@@ -89,3 +90,19 @@ def formation3(score):
                 Enemy(screen_width + enemy_width * i, layer + enemy_height, -3)
             )
     return formation
+
+def formation4(score):
+    formation = []
+    center_x = random.randint(0,screen_width- enemy_width*3)
+    center_y = -4*enemy_height
+    formation.append (Enemy(center_x,center_y,4))
+    num_enemies = score //10
+    #um_enemies= 8
+    radius = enemy_width * 2
+    for i in range(num_enemies+1):
+        angle = i * (2 * math.pi / num_enemies)
+        x = center_x + radius * math.cos(angle)
+        y = center_y + radius * math.sin(angle)
+        formation.append (Enemy(x,y,4))
+    return formation
+    

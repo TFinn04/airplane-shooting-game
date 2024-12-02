@@ -17,7 +17,7 @@ class Enemy:
         self.bullet_width = self.bullet_image.get_width()
         self.bullet_height = self.bullet_image.get_height()
 
-    def move(self):
+    def move(self,x,y):
         # cách kẻ địch di chuyển
         if self.in_formation == 0 or self.in_formation == 1:
             self.rect.y += enemy_speed
@@ -31,6 +31,8 @@ class Enemy:
             self.rect.x += enemy_speed
         if self.in_formation == -3:
             self.rect.x -= enemy_speed
+        if self.in_formation == 4:
+            self.rect.y += enemy_speed
 
     def draw(self, screen):
         # Hiển thị kẻ địch
@@ -44,7 +46,7 @@ class Enemy:
             self.rect.x + enemy_width // 2 - self.bullet_width // 2,
             self.rect.y,
             self.bullet_width,
-            self.bullet_height,
+            self.bullet_height//3,
         )
         self.bullets.append(bullet)
 
