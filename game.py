@@ -400,19 +400,19 @@ class Game:
                     self.boss = None
 
             # Check for player-enemy bullet collision
-            for enemy in enemies:
-                for bullet in enemy.bullets:
-                    if bullet.colliderect(
-                        pygame.Rect(
-                            player.x, player.y, spaceship_width, spaceship_height
-                        )
-                    ):
-                        enemy.bullets.remove(bullet)
-                        if player.lose_health():
-                            running = False
-                            if self.boss_active:
-                                self.boss_active = False
-                                self.boss = None
+            
+            for bullet in bullets:
+                if bullet.colliderect(
+                    pygame.Rect(
+                        player.x, player.y, spaceship_width, spaceship_height
+                    )
+                ):
+                    bullets.remove(bullet)
+                    if player.lose_health():
+                        running = False
+                        if self.boss_active:
+                            self.boss_active = False
+                            self.boss = None
 
             # Check for player-boss bullet collision
             if self.boss:
